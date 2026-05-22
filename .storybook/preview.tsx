@@ -61,7 +61,7 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ["UI", ["*"]],
+        order: ["Docs", ["Introduction", "Design System"], "UI", ["*"]],
       },
     },
   },

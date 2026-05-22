@@ -1,0 +1,26 @@
+import { Meta, Title, Subtitle } from "@storybook/addon-docs/blocks"
+import designSource from "../../DESIGN.md?raw"
+import { DesignMarkdown } from "@/components/ui/_storybook/DesignMarkdown"
+import "./design-doc.css"
+
+<Meta
+  title="Docs/Design System"
+  parameters={{
+    layout: "fullscreen",
+    docs: {
+      canvas: { hidden: true },
+      toc: {
+        headingSelector: ".sb-design-doc-content h2, .sb-design-doc-content h3",
+        title: "On this page",
+      },
+    },
+  }}
+/>
+
+<Title>Design System</Title>
+
+<Subtitle>
+  Live view of <code>DESIGN.md</code> — tokens, themes, typography, and component guidance.
+</Subtitle>
+
+<DesignMarkdown source={designSource} />

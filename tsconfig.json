@@ -29,7 +29,9 @@
     "node_modules",
     "**/*.stories.ts",
     "**/*.stories.tsx",
+    "**/*.mdx",
     ".storybook",
+    "src/docs",
     "storybook-static"
   ]
 }

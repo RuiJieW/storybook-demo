@@ -44,7 +44,9 @@ UI stories live in `src/components/ui/*.stories.tsx`.
 
 ## Deploy on Vercel
 
-Deploy the **Next.js app** and **Storybook** as two Vercel projects from this repo (e.g. `demo.yourdomain.com` and `storybook.demo.yourdomain.com`). See [docs/vercel-deploy.md](./docs/vercel-deploy.md).
+Two projects from this repo — see [docs/vercel-deploy.md](./docs/vercel-deploy.md).
 
-- App: default Next.js settings, `npm run build`
-- Storybook: `npm run build-storybook`, output `storybook-static` (see `vercel.storybook.json`)
+| Site | URL | Build |
+|------|-----|-------|
+| App | https://storybook-demo-pi.vercel.app/ | `npm run build` / `npm run release:app` |
+| Storybook | https://storybook-demo-ui.vercel.app/ | `npm run build-storybook` / `npm run release:storybook` |

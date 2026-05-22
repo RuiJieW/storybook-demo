@@ -42,6 +42,13 @@ npm run build-storybook    # static export → storybook-static/
 
 UI stories live in `src/components/ui/*.stories.tsx`.
 
+Override the Storybook URL for the app (lab home + sidebar link):
+
+```bash
+# .env.local
+NEXT_PUBLIC_STORYBOOK_URL=http://localhost:6006
+```
+
 ## Deploy on Vercel
 
 Two projects from this repo — see [docs/vercel-deploy.md](./docs/vercel-deploy.md).

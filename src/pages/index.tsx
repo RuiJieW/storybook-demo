@@ -1,5 +1,5 @@
-import { Dashboard } from "@/components/dashboard/dashboard"
+import { Lab } from "@/components/lab/lab"
 
 export default function Home() {
-  return <Dashboard />
+  return <Lab />
 }

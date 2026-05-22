@@ -33,8 +33,18 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Storybook
+
+```bash
+npm run storybook          # dev on http://localhost:6006
+npm run build-storybook    # static export → storybook-static/
+```
+
+UI stories live in `src/components/ui/*.stories.tsx`.
+
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Deploy the **Next.js app** and **Storybook** as two Vercel projects from this repo (e.g. `demo.yourdomain.com` and `storybook.demo.yourdomain.com`). See [docs/vercel-deploy.md](./docs/vercel-deploy.md).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+- App: default Next.js settings, `npm run build`
+- Storybook: `npm run build-storybook`, output `storybook-static` (see `vercel.storybook.json`)

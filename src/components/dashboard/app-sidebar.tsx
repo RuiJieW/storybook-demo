@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { useRouter } from "next/router"
 import {
   BeakerIcon,
   BookOpenIcon,
@@ -39,7 +39,7 @@ function isNavActive(pathname: string, href: string) {
 }
 
 export function AppSidebar() {
-  const pathname = usePathname()
+  const { pathname } = useRouter()
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">

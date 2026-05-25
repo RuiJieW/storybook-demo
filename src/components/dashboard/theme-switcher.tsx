@@ -27,16 +27,6 @@ export function ThemeSwitcher() {
     setMounted(true)
   }, [])
 
-  if (!mounted) {
-    return (
-      <Select disabled>
-        <SelectTrigger size="sm" className="w-36" aria-label="Theme">
-          <SelectValue placeholder="Theme" />
-        </SelectTrigger>
-      </Select>
-    )
-  }
-
   const active =
     themeOptions.find((option) => option.nextTheme === (theme ?? resolvedTheme))
       ?.value ?? "brand-light"
@@ -44,6 +34,7 @@ export function ThemeSwitcher() {
   return (
     <Select
       value={active}
+      disabled={!mounted}
       onValueChange={(value) => {
         const option = themeOptions.find((item) => item.value === value)
         if (option) {

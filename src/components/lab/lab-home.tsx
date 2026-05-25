@@ -118,6 +118,7 @@ export function LabHome() {
           <Button
             variant="outline"
             className="shrink-0"
+            nativeButton={false}
             render={
               <a
                 href={storybookUrl}

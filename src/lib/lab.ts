@@ -27,7 +27,7 @@ export const labExperiments: readonly LabExperiment[] = [
   },
   {
     id: "dashboard",
-    title: "Clay dashboard",
+    title: "Demo dashboard",
     description:
       "Full dashboard shell — charts, tables, and saturated feature cards on the cream canvas.",
     href: "/dashboard",

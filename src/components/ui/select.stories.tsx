@@ -13,6 +13,17 @@ const meta = {
   title: "UI/Select",
   component: Select,
   tags: ["autodocs"],
+  parameters: {
+    docs: {
+      description: {
+        component:
+          "Elevated panels use `elevatedSurfaceClasses` (`bg-card`), not inverted `popover` tokens. See DESIGN.md.",
+      },
+    },
+  },
+  globals: {
+    theme: "light",
+  },
 } satisfies Meta<typeof Select>
 
 export default meta

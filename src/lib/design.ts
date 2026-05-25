@@ -1,3 +1,5 @@
+import type { TobogganLogoColor } from "@/components/brand/toboggan-logo"
+
 export const designThemes = ["brand-light", "brand-dark", "wireframe"] as const
 
 export type DesignTheme = (typeof designThemes)[number]
@@ -7,6 +9,20 @@ export const themeHtmlClass: Record<DesignTheme, string | null> = {
   "brand-light": null,
   "brand-dark": "dark",
   wireframe: "wireframe",
+}
+
+export const logoColorByDesignTheme: Record<DesignTheme, TobogganLogoColor> = {
+  "brand-light": "default",
+  "brand-dark": "white",
+  wireframe: "black",
+}
+
+export function designThemeFromNextTheme(
+  nextTheme: string | undefined
+): DesignTheme {
+  if (nextTheme === "dark") return "brand-dark"
+  if (nextTheme === "wireframe") return "wireframe"
+  return "brand-light"
 }
 
 export const featureCardSurfaces = [

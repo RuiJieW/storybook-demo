@@ -2,12 +2,14 @@
 
 import Link from "next/link"
 import { useRouter } from "next/router"
+import { useTheme } from "next-themes"
 import {
   BeakerIcon,
   BookOpenIcon,
   LayoutDashboardIcon,
 } from "lucide-react"
 
+import { TobogganLogo } from "@/components/brand/toboggan-logo"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Sidebar,
@@ -23,6 +25,10 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { storybookUrl } from "@/lib/lab"
+import {
+  designThemeFromNextTheme,
+  logoColorByDesignTheme,
+} from "@/lib/design"
 
 const labItem = {
   title: "Lab",
@@ -40,27 +46,32 @@ function isNavActive(pathname: string, href: string) {
 
 export function AppSidebar() {
   const { pathname } = useRouter()
+  const { theme, resolvedTheme } = useTheme()
+  const logoColor =
+    logoColorByDesignTheme[
+      designThemeFromNextTheme(theme ?? resolvedTheme)
+    ]
 
   return (
     <Sidebar collapsible="icon" className="border-r border-border">
       <SidebarHeader className="border-b border-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              size="lg"
-              className="cursor-default"
-              render={<Link href="/" />}
+            <Link
+              href="/"
+              aria-label="Toboggan Labs home"
+              className="flex w-full items-center rounded-md p-2 outline-hidden ring-sidebar-ring focus-visible:ring-2"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-chart-2 text-primary-foreground">
-                <BeakerIcon className="size-4" />
-              </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">Storybook demo</span>
-                <span className="truncate text-xs text-muted-foreground">
-                  Design lab
-                </span>
-              </div>
-            </SidebarMenuButton>
+              <TobogganLogo
+                variant="icon"
+                color={logoColor}
+                className="hidden group-data-[collapsible=icon]:block"
+              />
+              <TobogganLogo
+                color={logoColor}
+                className="h-auto w-full group-data-[collapsible=icon]:hidden"
+              />
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

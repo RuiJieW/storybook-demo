@@ -332,7 +332,7 @@ Semantic Figma variables (collection **Theme**) map to shadcn CSS custom propert
 | `general/border` | `--border` | `#e5e5e5` |
 | `card/card` | `--card` | `#ffffff` |
 | `card/card foreground` | `--card-foreground` | `#0a0a0a` |
-| `popover/popover` | `--popover` | `#000000` |
+| `popover/popover` | `--popover` | `#000000` — **inverted overlay only** (see [Popover vs elevated panels](#popover-vs-elevated-panels)); not for menus/modals in code |
 | `popover/popover foreground` | `--popover-foreground` | `#ffffff` |
 | `chart/legacy/chart 1`–`5` | `--chart-1`–`--chart-5` | see `{colors.chart-*}` |
 | `focus/ring` | `--ring` | `#b5a4c1` (`aubergine/300`) |
@@ -403,7 +403,31 @@ Reference: [tobogganlabs.com/en](https://tobogganlabs.com/en) — healthcare tec
 | **Readable emphasis** | `accent-foreground` (`{colors.brand-violet}`) | Eyebrows, inline highlights, “Explore” links — one accent per block |
 | **Energy accents** | `{colors.brand-magenta}`, `{colors.brand-violet}`, `{colors.brand-yellow}`, `{colors.brand-cyan}` | Carousel slides, feature cards, multi-series charts — **one dominant accent per composed block** |
 | **State** | `destructive`, `ring` | Errors; focus only |
-| **Inverted overlay** | `popover` + `popover-foreground` | Menus/tooltips in light mode (black surface) — do not reuse for marketing heroes |
+| **Inverted overlay** | `popover` + `popover-foreground` | Tooltips, popovers, hover cards in light mode (black surface) — do not reuse for marketing heroes |
+| **Elevated panels** | `card` + `card-foreground` (+ `elevatedSurfaceClasses` in UI) | Menus, selects, dialogs, sheets, drawers — match form/card surfaces on white canvas |
+
+### Popover vs elevated panels
+
+Figma’s `popover` token is **inverted relative to the page canvas** on purpose. That is a design choice, not a bug — but **product code must not map every floating UI to `bg-popover`**.
+
+| Theme | Canvas (`background`) | `popover` (overlay) | `card` (elevated panel) |
+|---|---|---|---|
+| brand-light | White | Black + white text | White + dark text |
+| brand-dark | Black | White + black text | Dark gray (`#171717`) + light text |
+
+**Why invert `popover`?** On a white product canvas, small floating layers (tooltip, popover, hover card) need to read as a distinct “layer above” the page. Black-on-white (light) and white-on-black (dark) gives that contrast without another white box on white.
+
+**Code rule (required):**
+
+| Surface type | Tailwind | Shared helper | Examples |
+|---|---|---|---|
+| Inverted overlay | `bg-popover` `text-popover-foreground` | — | `Popover`, `HoverCard`, `Tooltip` |
+| Elevated panel | `bg-card` `text-card-foreground` `border-border` | `elevatedSurfaceClasses` in `src/components/ui/menu-surface.ts` | `Select`, `DropdownMenu`, `Combobox`, `ContextMenu`, `Command`, `Dialog`, `AlertDialog`, `Sheet`, `Drawer`, `NavigationMenu` |
+
+- **Do** import `elevatedSurfaceClasses` (or equivalent card tokens) for new menu/modal/list panels.
+- **Do** keep Figma `popover` values in `globals.css` — they are correct for true overlays.
+- **Don’t** use `bg-popover` on selects, dropdowns, dialogs, or sheets because shadcn scaffolds do by default.
+- **Don’t** change `--popover` in CSS to white to “fix” menus — that breaks intentional overlay contrast; fix the component mapping instead.
 
 ### Brand accents
 
@@ -436,7 +460,8 @@ Prefer semantic Tailwind classes over raw aubergine primitives:
 - `bg-muted` / `text-muted-foreground` — subdued UI, stat labels, logo strip context
 - `bg-accent` / `text-accent-foreground` — subtle highlight surfaces; violet emphasis text
 - `bg-destructive` — errors only
-- `bg-card` / `text-card-foreground` — elevated cards on white
+- `bg-card` / `text-card-foreground` — elevated cards, menus, and modals (see [Popover vs elevated panels](#popover-vs-elevated-panels))
+- `bg-popover` / `text-popover-foreground` — **only** tooltips, popovers, hover cards
 - `border-border` / `ring-ring` — borders and focus
 
 ### Chart tokens in UI
@@ -561,6 +586,10 @@ In wireframe mode, chart slots map to neutral tones (see `{themes.wireframe.comp
 
 **`sidebar-shell`** — Uses `--sidebar*` tokens from Figma `sidebar/*`. Light: `#fafafa` sidebar on white app background; dark: `#0a0a0a` sidebar on black canvas.
 
+### Elevated panels (menus & modals)
+
+Floating list and modal surfaces use **`elevatedSurfaceClasses`** (`bg-card`, `text-card-foreground`, `border-border`), not `bg-popover`. See [Popover vs elevated panels](#popover-vs-elevated-panels). Storybook stories for these components should use **brand-light** unless explicitly testing dark mode.
+
 ## Do's and Don'ts
 
 ### Do
@@ -570,6 +599,7 @@ In wireframe mode, chart slots map to neutral tones (see `{themes.wireframe.comp
 - Reference `{colors.*}` or CSS variables in docs — not ad hoc hex in code.
 - Switch to `wireframe` class for layout-only iteration.
 - Pull new values from `docs/Toboggan Labs Design System-variables-full.json` when Figma changes.
+- Use `elevatedSurfaceClasses` for menus, selects, and modals; reserve `bg-popover` for tooltip/popover/hover-card only.
 
 ### Don't
 - Don't use legacy Clay cream canvas (`#fffaf0`) or saturated Clay feature-card palettes — superseded by aubergine + four brand accents.
@@ -578,6 +608,7 @@ In wireframe mode, chart slots map to neutral tones (see `{themes.wireframe.comp
 - Don't hardcode `aubergine/*` primitives when a semantic token exists.
 - Don't combine `wireframe` + `dark` without defining overrides.
 - Don't document hover states in this spec (handle in component stories).
+- Don't put `bg-popover` on dropdowns, dialogs, sheets, or drawers — Figma’s black `popover` token is for inverted overlays, not form UI.
 
 ## Iteration guide
 

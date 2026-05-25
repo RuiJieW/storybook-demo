@@ -126,7 +126,9 @@ export function ColorTokenSwatches() {
               </p>
               <p className="border-t border-border px-2 py-1 font-mono text-[10px] text-muted-foreground/80">
                 {s.token}
-                {s.themeAware ? " · via primary" : ` · ${s.hex}`}
+                {"themeAware" in s && s.themeAware
+                  ? " · via primary"
+                  : ` · ${s.hex}`}
               </p>
             </li>
           ))}

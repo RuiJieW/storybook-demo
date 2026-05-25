@@ -1,27 +1,16 @@
 import type { Preview } from "@storybook/nextjs-vite"
-import { Inter, Geist_Mono } from "next/font/google"
 import { cn } from "@/lib/utils"
+import { fontSans, fontVariables } from "@/lib/fonts"
 import { withAppProviders } from "@/components/ui/_storybook/decorators"
 import "@/styles/globals.css"
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-})
 
 const preview: Preview = {
   decorators: [
     (Story) => (
       <div
         className={cn(
-          inter.variable,
-          inter.className,
-          geistMono.variable,
+          ...fontVariables,
+          fontSans.className,
           "min-h-[200px] bg-background p-6 text-foreground",
         )}
       >

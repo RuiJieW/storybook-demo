@@ -1,7 +1,20 @@
 import { Meta, Title, Subtitle } from "@storybook/addon-docs/blocks"
 import designSource from "../../DESIGN.md?raw"
+import { ColorTokenSwatches } from "@/components/ui/_storybook/ColorTokenSwatches"
 import { DesignMarkdown } from "@/components/ui/_storybook/DesignMarkdown"
 import "./design-doc.css"
+
+export const designDocParts = (() => {
+  const marker = "## Visual language"
+  const split = designSource.indexOf(marker)
+  if (split === -1) {
+    return { before: designSource, fromVisualLanguage: "" }
+  }
+  return {
+    before: designSource.slice(0, split).trim(),
+    fromVisualLanguage: designSource.slice(split).trim(),
+  }
+})()
 
 <Meta
   title="Docs/Design System"
@@ -10,7 +23,8 @@ import "./design-doc.css"
     docs: {
       canvas: { hidden: true },
       toc: {
-        headingSelector: ".sb-design-doc-content h2, .sb-design-doc-content h3",
+        headingSelector:
+          ".sb-design-doc-content h2, .sb-design-doc-content h3, .sb-color-swatches h2, .sb-color-swatches h3",
         title: "On this page",
       },
     },
@@ -20,7 +34,16 @@ import "./design-doc.css"
 <Title>Design System</Title>
 
 <Subtitle>
-  Live view of <code>DESIGN.md</code> — tokens, themes, typography, and component guidance.
+  Live view of <code>DESIGN.md</code> — tokens, themes, color &amp; visual language, typography,
+  and component guidance.
 </Subtitle>
 
-<DesignMarkdown source={designSource} />
+<DesignMarkdown source={designDocParts.before} />
+
+<div className="sb-color-swatches">
+  <ColorTokenSwatches />
+</div>
+
+{designDocParts.fromVisualLanguage ? (
+  <DesignMarkdown source={designDocParts.fromVisualLanguage} />
+) : null}

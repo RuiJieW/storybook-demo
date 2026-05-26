@@ -1,7 +1,7 @@
 "use client"
 
 import { ChevronDown } from "lucide-react"
-import type { ReactNode } from "react"
+import { useMemo, type ReactNode } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import {
@@ -19,6 +19,7 @@ import type {
   JourneyItem,
   JourneyLane,
   JourneyLifecycleStage,
+  JourneyOwnershipCard,
   JourneyTier,
 } from "@/components/journey-atlas/types"
 import { cn } from "@/lib/utils"
@@ -35,6 +36,7 @@ type JourneyGridProps = Readonly<{
   onSelectItem: (item: JourneyItem) => void
   collapsedLaneIds: ReadonlySet<string>
   onToggleLaneCollapse: (laneId: string) => void
+  ownership: readonly JourneyOwnershipCard[]
 }>
 
 const toneByLaneId: Record<string, string> = {
@@ -154,6 +156,19 @@ function CollapsedLaneHandoffPlaceholder({
         )
       })}
     </>
+  )
+}
+
+function OwnershipCard({ card }: Readonly<{ card: JourneyOwnershipCard }>) {
+  return (
+    <div className="w-full max-w-[200px] rounded-md border border-border bg-card p-2 text-card-foreground">
+      <p className="text-xs font-semibold leading-5 text-foreground">{card.label}</p>
+      {card.description ? (
+        <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
+          {card.description}
+        </p>
+      ) : null}
+    </div>
   )
 }
 
@@ -678,9 +693,15 @@ export function JourneyGrid({
   onSelectItem,
   collapsedLaneIds,
   onToggleLaneCollapse,
+  ownership,
 }: JourneyGridProps) {
   const opportunityOtherBandVisible =
     hasAnyOpportunityUntieredAcrossHandoffs(items, handoffs)
+
+  const ownershipByHandoffId = useMemo(
+    () => new Map(ownership.map((card) => [card.handoffId, card])),
+    [ownership]
+  )
 
   return (
     <div
@@ -763,16 +784,14 @@ export function JourneyGrid({
         )}
       >
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Dev tracks
-        </p>
-        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
-          Inside Development
+          Ownership
         </p>
       </div>
 
       {handoffs.map((handoff, index) => {
         const isDevelopment = handoff.id === journeyAtlasDevelopmentStageId
         const isActive = activeHandoffId === handoff.id
+        const ownershipCard = ownershipByHandoffId.get(handoff.id)
 
         return (
           <div
@@ -798,6 +817,8 @@ export function JourneyGrid({
                   </div>
                 ))}
               </div>
+            ) : ownershipByHandoffId.has(handoff.id) ? (
+              <OwnershipCard card={ownershipByHandoffId.get(handoff.id)!} />
             ) : (
               <p className="py-1 text-center text-[10px] text-muted-foreground">—</p>
             )}

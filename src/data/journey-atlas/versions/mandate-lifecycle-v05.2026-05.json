@@ -277,6 +277,18 @@
       }
     },
     {
+      "id": "touchpoint-hubspot-notion-charter",
+      "laneId": "touchpoints",
+      "handoffIds": ["sales"],
+      "tag": "Artifact",
+      "text": "HubSpot to Notion project charter — commercial deal context and scope signals land in the mandate hub before discovery.",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Chris"],
+        "sourceSections": ["4"]
+      }
+    },
+    {
       "id": "touchpoint-prototype-portal",
       "laneId": "touchpoints",
       "handoffIds": ["development", "deploy"],
@@ -321,7 +333,7 @@
       "handoffIds": ["discovery", "development"],
       "developmentSubTrack": "data-ai",
       "tag": "Artifact",
-      "text": "Domain glossary and SME rubric docs — bootstrap in discovery, consumed by prompts and eval loops in development.",
+      "text": "Fathom recordings, Miro board, and Google deck artifacts — primary discovery touchpoints for interviews, synthesis, and scope alignment.",
       "evidence": {
         "mentionCount": 4,
         "interviews": ["Adel", "Adrienne"],
@@ -1146,6 +1158,38 @@
         "mentionCount": 2,
         "sourceSections": ["9"]
       }
+    }
+  ],
+  "ownership": [
+    {
+      "id": "ownership-sales",
+      "handoffId": "sales",
+      "label": "Sales team",
+      "description": "PL / Sales — pitch, scope shape; read client AI literacy before committing to spec fidelity."
+    },
+    {
+      "id": "ownership-discovery",
+      "handoffId": "discovery",
+      "label": "Design + Dev + Data Lead & Client",
+      "description": "PL, Designer, Researcher, and SMEs align scope; client and data leads shape discovery constraints before kickoff."
+    },
+    {
+      "id": "ownership-start-mandate",
+      "handoffId": "start-mandate",
+      "label": "Project Lead",
+      "description": "PL seeds charter and context registry; Engineer, Designer, and DevOps execute setup skill and repo provisioning."
+    },
+    {
+      "id": "ownership-deploy",
+      "handoffId": "deploy",
+      "label": "Dev",
+      "description": "Dev deploys with feature flags; QA runs e2e and manual flow tests; PL signs off before live rollout."
+    },
+    {
+      "id": "ownership-end-of-mandate",
+      "handoffId": "end-of-mandate",
+      "label": "Entire team",
+      "description": "PL, Designer / Dev lead, Sales, and delivery roles close EOP checklist, retro, and upsell into the next mandate."
     }
   ],
   "thoughtSentiments": {

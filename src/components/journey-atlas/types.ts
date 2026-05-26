@@ -74,6 +74,14 @@ export type JourneyKpi = Readonly<{
   spark?: number[]
 }>
 
+/** Team ownership shown in the Ownership row above swim lanes. */
+export type JourneyOwnershipCard = Readonly<{
+  id: string
+  handoffId: string
+  label: string
+  description?: string
+}>
+
 export type JourneyAtlasData = Readonly<{
   meta: JourneyMeta
   stages: JourneyLifecycleStage[]
@@ -81,6 +89,8 @@ export type JourneyAtlasData = Readonly<{
   lanes: JourneyLane[]
   items: JourneyItem[]
   kpis: JourneyKpi[]
+  /** Per-handoff team ownership in the Ownership row. */
+  ownership?: readonly JourneyOwnershipCard[]
   /** Per-handoff sentiment for the Thoughts lane (0 = negative, 1 = positive). Mirrors `emotion` bars in journey.html. */
   thoughtSentiments?: Readonly<Partial<Record<string, number>>>
 }>

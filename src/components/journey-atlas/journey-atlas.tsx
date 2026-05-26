@@ -198,6 +198,7 @@ export function JourneyAtlas({
             selectedItemId={selectedItemId ?? selectedLocalItemId}
             collapsedLaneIds={collapsedLaneIds}
             onToggleLaneCollapse={toggleLaneCollapse}
+            ownership={data.ownership ?? []}
             onSelectItem={(item) => {
               setSelectedLocalItemId(item.id)
               setActiveHandoffId(item.handoffIds[0] ?? null)

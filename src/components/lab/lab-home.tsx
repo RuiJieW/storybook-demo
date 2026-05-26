@@ -6,6 +6,7 @@ import {
   BeakerIcon,
   BookOpenIcon,
   LayoutDashboardIcon,
+  MapIcon,
 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
@@ -23,6 +24,7 @@ import { cn } from "@/lib/utils"
 const experimentIcons: Record<string, typeof BeakerIcon> = {
   storybook: BookOpenIcon,
   dashboard: LayoutDashboardIcon,
+  "user-journey": MapIcon,
   "design-spec": BookOpenIcon,
 }
 
@@ -76,7 +78,7 @@ function ExperimentCard({ experiment }: { experiment: LabExperiment }) {
 
 export function LabHome() {
   return (
-    <div className="flex flex-1 flex-col gap-8 p-6 md:gap-12 md:p-8 lg:p-10">
+    <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto p-6 md:gap-12 md:p-8 lg:p-10">
       <div className="max-w-2xl space-y-3">
         <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
           <BeakerIcon className="size-4" />

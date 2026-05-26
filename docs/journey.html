@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Customer Journey — Interactive Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0e;
+    --paper: #f4f1ea;
+    --paper-2: #ebe6db;
+    --rule: #1a1a1c;
+    --rule-soft: rgba(13,13,14,0.18);
+    --accent: #c8412a;
+    --accent-2: #1c5b8a;
+    --good: #2f6f3e;
+    --warn: #c98a16;
+    --bad: #b8341f;
+    --neutral: #6b6657;
+    --display: 'Fraunces', serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 12px;
+    overflow: hidden;
+  }
+
+  /* paper texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(0,0,0,0.025) 1px, transparent 1px),
+      radial-gradient(circle at 70% 80%, rgba(0,0,0,0.02) 1px, transparent 1px);
+    background-size: 3px 3px, 5px 5px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ===== HEADER ===== */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 64px;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex; align-items: stretch;
+    z-index: 100;
+    border-bottom: 2px solid var(--ink);
+  }
+  .brand {
+    display: flex; align-items: center;
+    padding: 0 22px;
+    border-right: 1px solid rgba(244,241,234,0.15);
+    gap: 14px;
+  }
+  .brand .mark {
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--paper);
+    display: grid; place-items: center;
+    font-family: var(--display);
+    font-weight: 700;
+    font-style: italic;
+    font-size: 16px;
+  }
+  .brand .title {
+    font-family: var(--display);
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  .brand .title small {
+    display: block;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    margin-top: 4px;
+    opacity: 0.55;
+    text-transform: uppercase;
+  }
+
+  .topbar-tools {
+    display: flex; align-items: center;
+    flex: 1;
+    padding: 0 16px;
+    gap: 6px;
+    overflow-x: auto;
+  }
+
+  .tool-group {
+    display: flex; align-items: center;
+    gap: 4px;
+    padding: 0 10px;
+    height: 100%;
+    border-right: 1px solid rgba(244,241,234,0.12);
+  }
+  .tool-group:last-of-type { border-right: none; }
+  .tool-label {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    opacity: 0.5;
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+
+  .chip {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid rgba(244,241,234,0.25);
+    padding: 5px 10px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .chip:hover { background: rgba(244,241,234,0.08); }
+  .chip.active {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+  .chip .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    display: inline-block;
+  }
+
+  .icon-btn {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid rgba(244,241,234,0.25);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .icon-btn:hover { background: rgba(244,241,234,0.08); }
+  .icon-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  .zoom-display {
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 0 10px;
+    min-width: 56px;
+    text-align: center;
+    opacity: 0.8;
+  }
+
+  /* ===== STAGE + KPI BAR (merged) ===== */
+  .stagekpi-bar {
+    position: fixed;
+    top: 64px; left: 0; right: 0;
+    height: 88px;
+    background: var(--paper-2);
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    z-index: 90;
+  }
+  .stagekpi-rail {
+    padding: 0 14px;
+    display: flex; flex-direction: column; justify-content: center;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    border-right: 1px solid var(--rule);
+    background: var(--paper-2);
+    min-width: 110px;
+  }
+  .stagekpi-rail .rail-title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink);
+    text-transform: none;
+    letter-spacing: -0.01em;
+  }
+
+  .stagekpi-cells {
+    flex: 1;
+    display: flex;
+  }
+
+  .stagekpi-cell {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 14px 8px;
+    border-right: 1px solid var(--rule-soft);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto 1fr;
+    gap: 2px 8px;
+    cursor: pointer;
+    position: relative;
+    background: var(--paper-2);
+    transition: background 0.15s;
+    overflow: hidden;
+  }
+  .stagekpi-cell:last-child { border-right: none; }
+  .stagekpi-cell:hover { background: var(--paper); }
+  .stagekpi-cell.expanded { background: var(--paper); }
+
+  /* health indicator top stripe */
+  .stagekpi-cell::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--neutral);
+  }
+  .stagekpi-cell[data-health="good"]::before { background: var(--good); }
+  .stagekpi-cell[data-health="warn"]::before { background: var(--warn); }
+  .stagekpi-cell[data-health="bad"]::before { background: var(--bad); }
+
+  .stagekpi-head {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex; align-items: baseline; gap: 8px;
+    min-width: 0;
+  }
+  .stagekpi-head .num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+  .stagekpi-head .name {
+    font-family: var(--display);
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .stagekpi-metric {
+    grid-column: 1 / 2;
+    grid-row: 2 / 3;
+    display: flex; flex-direction: column;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+  .stagekpi-label {
+    font-size: 8px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    line-height: 1;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .stagekpi-value-row {
+    display: flex; align-items: baseline; gap: 6px;
+    line-height: 1;
+  }
+  .stagekpi-value {
+    font-family: var(--display);
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stagekpi-unit {
+    font-size: 10px;
+    font-family: var(--mono);
+    color: var(--neutral);
+  }
+  .stagekpi-delta {
+    font-size: 9px;
+    font-family: var(--mono);
+    margin-left: 2px;
+  }
+  .stagekpi-delta.up { color: var(--good); }
+  .stagekpi-delta.down { color: var(--bad); }
+  .stagekpi-delta.flat { color: var(--neutral); }
+
+  .stagekpi-spark {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    width: 60px; height: 28px;
+    opacity: 0.7;
+    align-self: end;
+  }
+
+  .stagekpi-expand {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    align-self: start;
+    justify-self: end;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1;
+    color: var(--neutral);
+    transition: transform 0.2s;
+  }
+  .stagekpi-cell.expanded .stagekpi-expand { transform: rotate(180deg); color: var(--ink); }
+
+  /* ===== KPI DETAIL DROPDOWN ===== */
+  .kpi-detail {
+    position: fixed;
+    top: 152px; left: 0; right: 0;
+    background: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    z-index: 85;
+    display: none;
+    overflow: hidden;
+  }
+  .kpi-detail.open { display: block; }
+  .kpi-detail-inner {
+    padding: 20px 28px;
+    display: grid;
+    grid-template-columns: 280px 1fr 200px;
+    gap: 28px;
+    align-items: start;
+  }
+  .kpi-detail-header {
+    border-right: 1px solid var(--rule-soft);
+    padding-right: 24px;
+  }
+  .kpi-detail-tag {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    margin-bottom: 4px;
+  }
+  .kpi-detail-title {
+    font-family: var(--display);
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+  }
+  .kpi-detail-big {
+    font-family: var(--display);
+    font-size: 44px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin-top: 10px;
+    display: flex; align-items: baseline; gap: 8px;
+  }
+  .kpi-detail-big .unit {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--neutral);
+    font-weight: 400;
+  }
+  .kpi-detail-chart {
+    height: 100px;
+    border: 1px solid var(--rule-soft);
+    background:
+      linear-gradient(to bottom, transparent 0%, transparent 49%, var(--rule-soft) 49%, var(--rule-soft) 50%, transparent 50%, transparent 100%),
+      var(--paper);
+    position: relative;
+  }
+  .kpi-detail-side {
+    display: flex; flex-direction: column;
+    gap: 10px;
+  }
+  .kpi-detail-stat {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: var(--mono);
+    font-size: 11px;
+  }
+  .kpi-detail-stat:last-child { border: none; }
+  .kpi-detail-stat .k { color: var(--neutral); }
+  .kpi-detail-stat .v {
+    font-family: var(--display);
+    font-size: 14px;
+  }
+  .kpi-detail-close {
+    position: absolute;
+    top: 12px; right: 16px;
+    background: transparent;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    width: 24px; height: 24px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    font-family: var(--mono);
+  }
+  .kpi-detail-close:hover {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* ===== CANVAS ===== */
+  .canvas-wrap {
+    position: fixed;
+    top: 152px;
+    left: 0; right: 0; bottom: 28px;
+    overflow: hidden;
+    background: var(--paper);
+    cursor: grab;
+    transition: top 0.25s ease;
+  }
+  .canvas-wrap.detail-open { top: 332px; }
+  .canvas-wrap.dragging { cursor: grabbing; }
+
+  /* grid background */
+  .canvas-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(to right, rgba(13,13,14,0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(13,13,14,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .canvas {
+    position: absolute;
+    top: 0; left: 0;
+    transform-origin: 0 0;
+    transition: transform 0.05s linear;
+  }
+
+  /* ===== JOURNEY GRID ===== */
+  .journey {
+    display: grid;
+    grid-template-columns: 220px repeat(var(--stages, 6), 280px);
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+  }
+
+  /* stage header row */
+  .stage-head {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 16px;
+    border-right: 1px solid rgba(244,241,234,0.15);
+    position: relative;
+  }
+  .stage-head:last-child { border-right: none; }
+  .stage-head .num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 11px;
+    opacity: 0.55;
+    letter-spacing: 0.08em;
+  }
+  .stage-head .name {
+    font-family: var(--display);
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
+    margin-top: 2px;
+  }
+  .stage-head .meta {
+    margin-top: 8px;
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+  .corner {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 16px;
+    border-right: 1px solid rgba(244,241,234,0.15);
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .corner .title {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .corner .sub {
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.55;
+  }
+
+  /* lane label cells */
+  .lane-label {
+    padding: 14px 14px 14px 14px;
+    border-top: 1px solid var(--rule);
+    border-right: 1.5px solid var(--ink);
+    background: var(--paper-2);
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 12px;
+    align-items: start;
+    cursor: pointer;
+    transition: background 0.15s, padding 0.25s ease;
+    position: relative;
+    user-select: none;
+  }
+  .lane-label:hover { background: var(--paper); }
+
+  .lane-label-toggle-col {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 2px;
+  }
+  .lane-label-content {
+    display: flex; flex-direction: column;
+    justify-content: space-between;
+    min-height: 0;
+    gap: 10px;
+  }
+
+  .lane-label .lane-num {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .lane-label .lane-name {
+    font-family: var(--display);
+    font-size: 17px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-top: 2px;
+    transition: font-size 0.25s ease, margin 0.25s ease;
+  }
+  .lane-label .lane-meta {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    display: flex; justify-content: space-between; align-items: center;
+    transition: opacity 0.2s, margin 0.25s ease;
+  }
+  .lane-toggle {
+    width: 20px; height: 20px;
+    border: 1px solid var(--ink);
+    display: grid; place-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+    background: var(--paper);
+    transition: transform 0.25s ease, background 0.15s, color 0.15s;
+    flex-shrink: 0;
+  }
+  .lane-label:hover .lane-toggle { background: var(--ink); color: var(--paper); }
+  .lane-label.collapsed .lane-toggle { transform: rotate(-90deg); }
+
+  /* collapsed lane label — compact header strip */
+  .lane-label.collapsed {
+    padding: 8px 14px;
+    min-height: 0;
+    align-items: center;
+  }
+  .lane-label.collapsed .lane-label-toggle-col {
+    padding-top: 0;
+    align-items: center;
+  }
+  .lane-label.collapsed .lane-num,
+  .lane-label.collapsed .lane-meta {
+    display: none;
+  }
+  .lane-label.collapsed .lane-label-content {
+    gap: 0;
+  }
+  .lane-label.collapsed .lane-name {
+    font-size: 13px;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .lane-label.collapsed .lane-name::after {
+    content: attr(data-count) ' items';
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  /* cells */
+  .cell {
+    border-top: 1px solid var(--rule);
+    border-right: 1px solid var(--rule-soft);
+    padding: 14px;
+    min-height: 140px;
+    display: flex; flex-direction: column;
+    gap: 8px;
+    position: relative;
+    background: var(--paper);
+    transition: background 0.15s, min-height 0.25s ease, padding 0.25s ease;
+    overflow: hidden;
+  }
+  .cell:last-child { border-right: none; }
+  .cell:hover { background: var(--paper-2); }
+
+  /* collapsed cell — thin strip showing only that the lane exists */
+  .cell.collapsed {
+    min-height: 0;
+    max-height: 36px;
+    padding: 0;
+  }
+  .cell.collapsed .item,
+  .cell.collapsed .emotion-bar {
+    display: none;
+  }
+  .cell.collapsed::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 14px; right: 14px;
+    height: 1px;
+    background: var(--rule-soft);
+    transform: translateY(-50%);
+  }
+
+  /* item card */
+  .item {
+    border: 1px solid var(--rule);
+    padding: 8px 10px;
+    background: var(--paper);
+    font-size: 11px;
+    line-height: 1.35;
+    position: relative;
+    transition: all 0.15s;
+  }
+  .item:hover {
+    background: var(--ink);
+    color: var(--paper);
+    transform: translate(-1px, -1px);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .item .item-tag {
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    margin-bottom: 3px;
+  }
+  .item:hover .item-tag { color: rgba(244,241,234,0.6); }
+
+  /* ===== FOCUS STATE — when drawer is open ===== */
+
+  /* dim everything by default when focusing */
+  .journey.has-focus .item,
+  .journey.has-focus .stage-head,
+  .journey.has-focus .lane-label,
+  .journey.has-focus .cell {
+    transition: opacity 0.2s, background 0.2s;
+  }
+  .journey.has-focus .item { opacity: 0.25; }
+  .journey.has-focus .stage-head,
+  .journey.has-focus .lane-label { opacity: 0.4; }
+
+  /* highlight the focused item — bold, lifted, accent-bordered */
+  .item.is-focused {
+    opacity: 1 !important;
+    background: var(--ink) !important;
+    color: var(--paper) !important;
+    border-color: var(--ink) !important;
+    transform: translate(-2px, -2px);
+    box-shadow:
+      3px 3px 0 var(--accent),
+      6px 6px 0 var(--ink);
+    z-index: 5;
+  }
+  .item.is-focused .item-tag {
+    color: var(--accent) !important;
+    font-weight: 700;
+  }
+  /* small pointer indicator on the focused item pointing toward the drawer */
+  .item.is-focused::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -10px;
+    transform: translateY(-50%);
+    width: 0; height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 8px solid var(--accent);
+  }
+
+  /* highlight the row (lane) the focused item belongs to */
+  .journey.has-focus .cell.is-focus-row {
+    background: rgba(200, 65, 42, 0.04);
+  }
+  .journey.has-focus .cell.is-focus-row .item:not(.is-focused) {
+    opacity: 0.5;
+  }
+  .journey.has-focus .lane-label.is-focus-row {
+    opacity: 1;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .journey.has-focus .lane-label.is-focus-row .lane-num {
+    color: var(--paper);
+  }
+  .journey.has-focus .lane-label.is-focus-row .lane-meta {
+    color: rgba(244,241,234,0.6);
+  }
+  .journey.has-focus .lane-label.is-focus-row .lane-toggle {
+    border-color: var(--paper);
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* highlight the column (stage) the focused item belongs to */
+  .journey.has-focus .cell.is-focus-col {
+    background: rgba(200, 65, 42, 0.04);
+  }
+  .journey.has-focus .cell.is-focus-col .item:not(.is-focused) {
+    opacity: 0.5;
+  }
+  .journey.has-focus .stage-head.is-focus-col {
+    opacity: 1;
+    background: var(--accent);
+    color: var(--paper);
+  }
+  .journey.has-focus .stage-head.is-focus-col .num,
+  .journey.has-focus .stage-head.is-focus-col .meta {
+    opacity: 0.85;
+  }
+
+  /* intersection cell — row AND column both apply, slightly stronger */
+  .journey.has-focus .cell.is-focus-row.is-focus-col {
+    background: rgba(200, 65, 42, 0.08);
+  }
+
+  /* highlight the corresponding KPI cell in the top bar too */
+  .stagekpi-cell.is-focus-col {
+    background: var(--paper);
+    box-shadow: inset 0 -3px 0 var(--accent);
+  }
+
+  /* lane color accents on first column */
+  .lane-actions .lane-label { border-left: 4px solid var(--accent-2); }
+  .lane-touch .lane-label { border-left: 4px solid #5a8d3a; }
+  .lane-thoughts .lane-label { border-left: 4px solid #b87333; }
+  .lane-backend .lane-label { border-left: 4px solid #4a4a8a; }
+  .lane-team .lane-label { border-left: 4px solid #8a5a3a; }
+  .lane-pain .lane-label { border-left: 4px solid var(--accent); }
+  .lane-opportunity .lane-label { border-left: 4px solid #2f6f3e; }
+  .lane-initiatives .lane-label { border-left: 4px solid #1a1a1c; }
+
+  /* emotion curve cell special styling */
+  .emotion-bar {
+    height: 26px;
+    background: linear-gradient(to right, var(--bad), var(--warn) 35%, var(--warn) 65%, var(--good));
+    border: 1px solid var(--ink);
+    position: relative;
+    margin-top: 4px;
+  }
+  .emotion-marker {
+    position: absolute;
+    top: -3px; bottom: -3px;
+    width: 3px;
+    background: var(--ink);
+  }
+  .emotion-marker::after {
+    content: attr(data-val);
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 9px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1px 4px;
+    white-space: nowrap;
+  }
+
+  /* pain indicator */
+  .pain-pip {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    margin-right: 3px;
+  }
+  .pain-low { background: var(--good); }
+  .pain-med { background: var(--warn); }
+  .pain-high { background: var(--bad); }
+
+  /* opportunity indicator */
+  .opp-pip {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 0;
+    margin-right: 3px;
+    transform: rotate(45deg);
+    position: relative;
+    top: -1px;
+  }
+  .opp-low { background: #a8c4a8; }
+  .opp-med { background: #5a9d6a; }
+  .opp-high { background: var(--good); }
+
+  /* opportunity item variant — subtle green tint */
+  .item.item-opportunity {
+    background: rgba(47, 111, 62, 0.04);
+    border-left: 3px solid var(--good);
+  }
+  .item.item-opportunity:hover {
+    background: var(--good);
+    color: var(--paper);
+    border-color: var(--good);
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+
+  /* initiatives status indicator */
+  .status-pip {
+    display: inline-block;
+    width: 7px; height: 7px;
+    margin-right: 4px;
+    position: relative;
+    top: 0;
+  }
+  .status-pip.status-active {
+    background: var(--ink);
+    box-shadow: 0 0 0 2px rgba(13,13,14,0.15);
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+  .status-pip.status-planned {
+    background: transparent;
+    border: 1.5px solid var(--ink);
+  }
+  .status-pip.status-shipped {
+    background: var(--ink);
+  }
+  .status-pip.status-shipped::after {
+    content: '✓';
+    position: absolute;
+    top: -3px; left: 0;
+    color: var(--paper);
+    font-size: 8px;
+    line-height: 1;
+    width: 7px;
+    text-align: center;
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  @keyframes status-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(13,13,14,0.15); }
+    50% { box-shadow: 0 0 0 4px rgba(13,13,14,0.05); }
+  }
+
+  /* initiative item variant — distinct, dashed treatment */
+  .item.item-initiative {
+    background: var(--paper);
+    border: 1px dashed var(--ink);
+    border-left: 3px solid var(--ink);
+  }
+  .item.item-initiative:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-style: solid;
+    border-color: var(--ink);
+  }
+  .item.item-initiative:hover .status-pip.status-active,
+  .item.item-initiative:hover .status-pip.status-shipped {
+    background: var(--paper);
+  }
+  .item.item-initiative:hover .status-pip.status-shipped::after {
+    color: var(--ink);
+  }
+  .item.item-initiative:hover .status-pip.status-planned {
+    border-color: var(--paper);
+  }
+
+  /* ===== DETAIL DRAWER ===== */
+  .drawer {
+    position: fixed;
+    top: 0; right: 0; bottom: 0;
+    width: 420px;
+    background: var(--paper);
+    border-left: 2px solid var(--ink);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 200;
+    display: flex; flex-direction: column;
+    box-shadow: -8px 0 24px rgba(0,0,0,0.08);
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer-head {
+    padding: 20px 22px 16px;
+    background: var(--ink);
+    color: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+  }
+  .drawer-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    width: 26px; height: 26px;
+    background: transparent;
+    border: 1px solid rgba(244,241,234,0.4);
+    color: var(--paper);
+    cursor: pointer;
+    font-size: 14px;
+    font-family: var(--mono);
+  }
+  .drawer-tag {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 6px;
+  }
+  .drawer-title {
+    font-family: var(--display);
+    font-size: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+  }
+  .drawer-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    flex: 1;
+    font-size: 12px;
+    line-height: 1.55;
+  }
+  .drawer-section {
+    margin-bottom: 22px;
+  }
+  .drawer-section h4 {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--neutral);
+    margin: 0 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--rule);
+  }
+  .metric-row {
+    display: flex; justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--rule-soft);
+    font-family: var(--mono);
+  }
+  .metric-row:last-child { border: none; }
+  .metric-row .k { color: var(--neutral); font-size: 10px; }
+  .metric-row .v { font-family: var(--display); font-size: 15px; }
+
+  /* Flow-link CTA inside the drawer (initiatives only) */
+  .drawer-flow-cta h4 {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+  .flow-link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--ink);
+    color: var(--paper);
+    text-decoration: none;
+    border: 1.5px solid var(--ink);
+    transition: all 0.15s;
+    position: relative;
+  }
+  .flow-link-btn::after {
+    content: '';
+    position: absolute;
+    top: 4px; left: 4px; right: 4px; bottom: 4px;
+    border: 1px dashed rgba(244,241,234,0.25);
+    pointer-events: none;
+  }
+  .flow-link-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 3px 3px 0 var(--accent), 6px 6px 0 var(--ink);
+  }
+  .flow-link-btn:active {
+    transform: translate(0, 0);
+    box-shadow: none;
+  }
+  .flow-link-label {
+    display: flex; flex-direction: column;
+    gap: 4px;
+  }
+  .flow-link-tag {
+    font-size: 8px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .flow-link-title {
+    font-family: var(--display);
+    font-size: 18px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .flow-link-arrow {
+    font-family: var(--display);
+    font-style: italic;
+    font-size: 28px;
+    line-height: 1;
+    color: var(--accent);
+    transition: transform 0.15s;
+  }
+  .flow-link-btn:hover .flow-link-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ===== STATUS BAR ===== */
+  .statusbar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 28px;
+    background: var(--ink);
+    color: var(--paper);
+    display: flex; align-items: center;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    z-index: 100;
+  }
+  .status-cell {
+    padding: 0 14px;
+    height: 100%;
+    display: flex; align-items: center;
+    border-right: 1px solid rgba(244,241,234,0.15);
+    text-transform: uppercase;
+    gap: 8px;
+  }
+  .status-cell.flex { flex: 1; justify-content: flex-end; opacity: 0.6; }
+  .pulse {
+    width: 6px; height: 6px;
+    background: var(--good);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.3); }
+  }
+
+  /* ===== MINIMAP ===== */
+  .minimap {
+    position: fixed;
+    bottom: 40px; right: 16px;
+    width: 180px; height: 110px;
+    background: rgba(244,241,234,0.95);
+    border: 1.5px solid var(--ink);
+    z-index: 90;
+    padding: 6px;
+  }
+  .minimap-label {
+    position: absolute;
+    top: -8px; left: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    padding: 1px 6px;
+    text-transform: uppercase;
+  }
+  .minimap-inner {
+    width: 100%; height: 100%;
+    position: relative;
+    background-image:
+      linear-gradient(to right, rgba(13,13,14,0.08) 1px, transparent 1px);
+    background-size: calc(100% / 6) 100%;
+  }
+  .minimap-viewport {
+    position: absolute;
+    border: 1.5px solid var(--accent);
+    background: rgba(200,65,42,0.1);
+    pointer-events: none;
+  }
+
+  /* hide scrollbars subtly */
+  ::-webkit-scrollbar { height: 6px; width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--rule-soft); }
+
+  /* hidden lane stage */
+  .lane[data-hidden="true"] { display: contents; }
+  .lane[data-hidden="true"] > * { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ===== TOP BAR ===== -->
+<div class="topbar">
+  <div class="brand">
+    <div class="mark">J</div>
+    <div class="title">
+      Journey Atlas
+      <small>CX Cartography — v1.0</small>
+    </div>
+  </div>
+  <div class="topbar-tools">
+    <div class="tool-group">
+      <span class="tool-label">Lanes</span>
+      <button class="chip active" data-lane-toggle="actions"><span class="dot" style="background:#1c5b8a"></span>Actions</button>
+      <button class="chip active" data-lane-toggle="touch"><span class="dot" style="background:#5a8d3a"></span>Touchpoints</button>
+      <button class="chip active" data-lane-toggle="thoughts"><span class="dot" style="background:#b87333"></span>Thoughts</button>
+      <button class="chip active" data-lane-toggle="backend"><span class="dot" style="background:#4a4a8a"></span>Backend</button>
+      <button class="chip active" data-lane-toggle="team"><span class="dot" style="background:#8a5a3a"></span>Team</button>
+      <button class="chip active" data-lane-toggle="pain"><span class="dot" style="background:#c8412a"></span>Pain</button>
+      <button class="chip active" data-lane-toggle="opportunity"><span class="dot" style="background:#2f6f3e"></span>Opportunities</button>
+      <button class="chip active" data-lane-toggle="initiatives"><span class="dot" style="background:#1a1a1c"></span>Initiatives</button>
+      <button class="chip" id="collapse-toggle" title="Collapse/expand all lanes">◢ Collapse all</button>
+    </div>
+    <div class="tool-group">
+      <span class="tool-label">Filter</span>
+      <button class="chip active" data-filter="all">All</button>
+      <button class="chip" data-filter="critical">Critical pain</button>
+      <button class="chip" data-filter="opportunity">Opportunities</button>
+      <button class="chip" data-filter="active-initiatives">Active initiatives</button>
+    </div>
+    <div class="tool-group">
+      <span class="tool-label">View</span>
+      <button class="icon-btn" id="zoom-out" title="Zoom out">
+        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <span class="zoom-display" id="zoom-display">100%</span>
+      <button class="icon-btn" id="zoom-in" title="Zoom in">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+      <button class="icon-btn" id="zoom-fit" title="Fit to screen">
+        <svg viewBox="0 0 24 24"><polyline points="4,9 4,4 9,4"/><polyline points="15,4 20,4 20,9"/><polyline points="20,15 20,20 15,20"/><polyline points="9,20 4,20 4,15"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STAGE + KPI BAR (merged) ===== -->
+<div class="stagekpi-bar">
+  <div class="stagekpi-rail">
+    <div style="font-size: 9px; letter-spacing: 0.2em; opacity: 0.6;">Stages</div>
+    <div class="rail-title">Live signal</div>
+  </div>
+  <div class="stagekpi-cells" id="stagekpi-cells"></div>
+</div>
+
+<!-- ===== KPI DETAIL DROPDOWN ===== -->
+<div class="kpi-detail" id="kpi-detail">
+  <button class="kpi-detail-close" id="kpi-detail-close">×</button>
+  <div class="kpi-detail-inner" id="kpi-detail-inner"></div>
+</div>
+
+<!-- ===== CANVAS ===== -->
+<div class="canvas-wrap" id="canvas-wrap">
+  <div class="canvas" id="canvas">
+    <div class="journey" id="journey"></div>
+  </div>
+</div>
+
+<!-- ===== MINIMAP ===== -->
+<div class="minimap">
+  <div class="minimap-label">Overview</div>
+  <div class="minimap-inner">
+    <div class="minimap-viewport" id="minimap-viewport"></div>
+  </div>
+</div>
+
+<!-- ===== DRAWER ===== -->
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <button class="drawer-close" id="drawer-close">×</button>
+    <div class="drawer-tag" id="drawer-tag">Detail</div>
+    <div class="drawer-title" id="drawer-title">—</div>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<!-- ===== STATUS BAR ===== -->
+<div class="statusbar">
+  <div class="status-cell"><span class="pulse"></span>Live · Mock data stream</div>
+  <div class="status-cell" id="status-stages">6 stages</div>
+  <div class="status-cell" id="status-lanes">6 lanes visible</div>
+  <div class="status-cell" id="status-items">— items</div>
+  <div class="status-cell flex">Drag to pan · Scroll to zoom · Click KPI for detail · Shift+click KPI to jump · Click cell for item detail</div>
+</div>
+
+<script>
+/* =========================================================
+   DATA — swap this block out with real data later
+   ========================================================= */
+const STAGES = [
+  { id: 'awareness',  num: '01', name: 'Awareness',  meta: 'Discovery' },
+  { id: 'consider',   num: '02', name: 'Consider',   meta: 'Evaluation' },
+  { id: 'decide',     num: '03', name: 'Decide',     meta: 'Conversion' },
+  { id: 'onboard',    num: '04', name: 'Onboard',    meta: 'Activation' },
+  { id: 'use',        num: '05', name: 'Use',        meta: 'Retention' },
+  { id: 'advocate',   num: '06', name: 'Advocate',   meta: 'Loyalty' }
+];
+
+const LANES = [
+  { id: 'actions',     num: 'L01', name: 'User Actions',        meta: 'What they do',        className: 'lane-actions' },
+  { id: 'touch',       num: 'L02', name: 'Touchpoints',         meta: 'Where it happens',    className: 'lane-touch' },
+  { id: 'thoughts',    num: 'L03', name: 'Thoughts & Feelings', meta: 'Emotional state',     className: 'lane-thoughts' },
+  { id: 'backend',     num: 'L04', name: 'Backend Systems',     meta: 'Behind the scenes',   className: 'lane-backend' },
+  { id: 'team',        num: 'L05', name: 'Team / Ownership',    meta: 'Who is responsible',  className: 'lane-team' },
+  { id: 'pain',        num: 'L06', name: 'Pain Points',         meta: 'Where it hurts',      className: 'lane-pain' },
+  { id: 'opportunity', num: 'L07', name: 'Opportunities',       meta: 'Where to invest',     className: 'lane-opportunity' },
+  { id: 'initiatives', num: 'L08', name: 'Initiatives',         meta: 'In-flight workflows', className: 'lane-initiatives' }
+];
+
+// Cells: keyed by `${laneId}__${stageId}`
+const CELLS = {
+  // ===== ACTIONS =====
+  'actions__awareness': [
+    { tag: 'Search', text: 'Googles the problem they\'re trying to solve' },
+    { tag: 'Browse', text: 'Scans social feeds for recommendations' }
+  ],
+  'actions__consider': [
+    { tag: 'Research', text: 'Reads reviews and comparison articles' },
+    { tag: 'Ask', text: 'Posts question in community forum' }
+  ],
+  'actions__decide': [
+    { tag: 'Trial', text: 'Signs up for free trial / demo' },
+    { tag: 'Compare', text: 'Builds pros/cons list with stakeholders' }
+  ],
+  'actions__onboard': [
+    { tag: 'Setup', text: 'Configures account and invites team' },
+    { tag: 'Import', text: 'Migrates data from previous tool' }
+  ],
+  'actions__use': [
+    { tag: 'Daily', text: 'Performs core task 3-5× per week' },
+    { tag: 'Explore', text: 'Discovers advanced features over time' }
+  ],
+  'actions__advocate': [
+    { tag: 'Share', text: 'Recommends to peers on LinkedIn' },
+    { tag: 'Refer', text: 'Submits referral through partner program' }
+  ],
+
+  // ===== TOUCHPOINTS =====
+  'touch__awareness': [
+    { tag: 'Channel', text: 'Google Search · Twitter · LinkedIn ads' },
+    { tag: 'Owned', text: 'Marketing site landing page' }
+  ],
+  'touch__consider': [
+    { tag: 'Earned', text: 'G2 · Reddit · review aggregators' },
+    { tag: 'Owned', text: 'Product page · case studies' }
+  ],
+  'touch__decide': [
+    { tag: 'Sales', text: 'Demo call with AE · pricing page' },
+    { tag: 'Self-serve', text: 'In-product trial flow' }
+  ],
+  'touch__onboard': [
+    { tag: 'Product', text: 'In-app onboarding · setup wizard' },
+    { tag: 'Support', text: 'Welcome email sequence · CSM intro call' }
+  ],
+  'touch__use': [
+    { tag: 'Product', text: 'Core app · mobile · CLI · integrations' },
+    { tag: 'Support', text: 'Docs · Intercom chat · community Slack' }
+  ],
+  'touch__advocate': [
+    { tag: 'Community', text: 'User conferences · ambassador program' },
+    { tag: 'Social', text: 'Customer-generated content · case studies' }
+  ],
+
+  // ===== THOUGHTS =====
+  'thoughts__awareness': [
+    { tag: 'Curious', text: '"There has to be a better way to do this."', emotion: 0.45 }
+  ],
+  'thoughts__consider': [
+    { tag: 'Cautious', text: '"Will this actually work for our setup?"', emotion: 0.35 }
+  ],
+  'thoughts__decide': [
+    { tag: 'Anxious', text: '"What if I pick the wrong vendor?"', emotion: 0.25 }
+  ],
+  'thoughts__onboard': [
+    { tag: 'Hopeful', text: '"OK let\'s see if this lives up to the demo."', emotion: 0.55 }
+  ],
+  'thoughts__use': [
+    { tag: 'Confident', text: '"This is now part of how my team works."', emotion: 0.78 }
+  ],
+  'thoughts__advocate': [
+    { tag: 'Proud', text: '"Everyone in my network needs to know about this."', emotion: 0.92 }
+  ],
+
+  // ===== BACKEND =====
+  'backend__awareness': [
+    { tag: 'System', text: 'Ad attribution · UTM tracking · CDP' }
+  ],
+  'backend__consider': [
+    { tag: 'System', text: 'CRM lead capture · marketing automation' }
+  ],
+  'backend__decide': [
+    { tag: 'System', text: 'Billing system · trial provisioning · SSO' }
+  ],
+  'backend__onboard': [
+    { tag: 'System', text: 'Identity service · data migration pipeline' }
+  ],
+  'backend__use': [
+    { tag: 'System', text: 'Core product API · analytics · feature flags' }
+  ],
+  'backend__advocate': [
+    { tag: 'System', text: 'Referral tracking · NPS survey · advocacy hub' }
+  ],
+
+  // ===== TEAM =====
+  'team__awareness': [
+    { tag: 'Owner', text: 'Marketing · Growth team' }
+  ],
+  'team__consider': [
+    { tag: 'Owner', text: 'Marketing · Content · DevRel' }
+  ],
+  'team__decide': [
+    { tag: 'Owner', text: 'Sales · Solutions Engineering' }
+  ],
+  'team__onboard': [
+    { tag: 'Owner', text: 'Customer Success · Onboarding' }
+  ],
+  'team__use': [
+    { tag: 'Owner', text: 'Product · Support · CSM' }
+  ],
+  'team__advocate': [
+    { tag: 'Owner', text: 'Customer Marketing · Community' }
+  ],
+
+  // ===== PAIN =====
+  // ===== PAIN POINTS (friction only) =====
+  'pain__awareness': [
+    { tag: 'Friction', text: 'Hard to differentiate from competitors in search', severity: 'med' }
+  ],
+  'pain__consider': [
+    { tag: 'Friction', text: 'Pricing not transparent — requires demo to learn cost', severity: 'high' }
+  ],
+  'pain__decide': [
+    { tag: 'Friction', text: 'Procurement / legal review adds weeks', severity: 'high' }
+  ],
+  'pain__onboard': [
+    { tag: 'Friction', text: 'Data migration errors surface late in setup', severity: 'med' }
+  ],
+  'pain__use': [
+    { tag: 'Friction', text: 'Bulk operations require repetitive clicks', severity: 'low' }
+  ],
+  'pain__advocate': [
+    { tag: 'Friction', text: 'No clear path from happy user to referral', severity: 'med' }
+  ],
+
+  // ===== OPPORTUNITIES =====
+  'opportunity__awareness': [
+    { tag: 'Opportunity', text: 'SEO content series targeting comparison queries', impact: 'high' }
+  ],
+  'opportunity__consider': [
+    { tag: 'Opportunity', text: 'Self-serve pricing calculator with transparency', impact: 'high' }
+  ],
+  'opportunity__decide': [
+    { tag: 'Opportunity', text: 'Pre-vetted security & legal templates for procurement', impact: 'med' }
+  ],
+  'opportunity__onboard': [
+    { tag: 'Opportunity', text: 'Guided data import wizard with validation preview', impact: 'high' }
+  ],
+  'opportunity__use': [
+    { tag: 'Opportunity', text: 'Power-user keyboard shortcuts & bulk-edit mode', impact: 'med' }
+  ],
+  'opportunity__advocate': [
+    { tag: 'Opportunity', text: 'Formal referral incentive with tracked rewards', impact: 'med' }
+  ],
+
+  // ===== INITIATIVES (in-flight workflows / new journeys) =====
+  'initiatives__awareness': [
+    { tag: 'In Progress', text: 'Comparison hub launch · Q3', status: 'active' }
+  ],
+  'initiatives__consider': [
+    { tag: 'Planned', text: 'Pricing transparency redesign · Q4', status: 'planned' }
+  ],
+  'initiatives__decide': [
+    { tag: 'Active', text: 'Security trust center buildout', status: 'active' },
+    { tag: 'Planned', text: 'Self-serve PLG motion · Q4', status: 'planned' }
+  ],
+  'initiatives__onboard': [
+    { tag: 'In Progress', text: 'Import wizard v2 · in development', status: 'active' }
+  ],
+  'initiatives__use': [
+    { tag: 'Shipped', text: 'Command palette · launched last sprint', status: 'shipped' },
+    { tag: 'Planned', text: 'Bulk-edit mode · backlog', status: 'planned' }
+  ],
+  'initiatives__advocate': [
+    { tag: 'Active', text: 'Referral program pilot · 50 customers', status: 'active' }
+  ]
+};
+
+// Per-stage KPIs (mock — these will animate)
+const STAGE_KPIS = [
+  { stage: 'Awareness',   label: 'Impressions',   unit: 'k',  base: 248,   range: 10, target: 'up', spark: [180,195,210,225,238,248] },
+  { stage: 'Consider',    label: 'Engaged',       unit: '%',  base: 12.4,  range: 0.6, target: 'up', spark: [9,10,10.5,11.2,11.9,12.4] },
+  { stage: 'Decide',      label: 'Conversion',    unit: '%',  base: 3.8,   range: 0.3, target: 'up', spark: [2.9,3.1,3.4,3.5,3.7,3.8] },
+  { stage: 'Onboard',     label: 'Activation',    unit: '%',  base: 68,    range: 2,   target: 'up', spark: [55,58,62,64,66,68] },
+  { stage: 'Use',         label: 'WAU / MAU',     unit: '',   base: 0.58,  range: 0.04,target: 'up', spark: [0.42,0.45,0.5,0.53,0.56,0.58] },
+  { stage: 'Advocate',    label: 'NPS',           unit: '',   base: 47,    range: 3,   target: 'up', spark: [22,28,34,39,43,47] }
+];
+
+/* =========================================================
+   STATE
+   ========================================================= */
+const state = {
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+  hiddenLanes: new Set(),
+  collapsedLanes: new Set(),
+  filter: 'all',
+  selected: null,
+  detailIdx: null
+};
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function buildJourney() {
+  const journey = document.getElementById('journey');
+  journey.style.setProperty('--stages', STAGES.length);
+
+  // Top-left corner
+  const corner = document.createElement('div');
+  corner.className = 'corner';
+  corner.innerHTML = `
+    <div class="sub">Customer Journey</div>
+    <div class="title">Atlas</div>
+    <div class="sub">${STAGES.length} stages · ${LANES.length} lanes</div>
+  `;
+  journey.appendChild(corner);
+
+  // Stage headers
+  STAGES.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'stage-head';
+    el.dataset.stage = s.id;
+    el.innerHTML = `
+      <div class="num">${s.num}</div>
+      <div class="name">${s.name}</div>
+      <div class="meta">${s.meta}</div>
+    `;
+    journey.appendChild(el);
+  });
+
+  // Lane rows
+  LANES.forEach(lane => {
+    // Count items in this lane across all stages
+    const itemCount = STAGES.reduce((sum, stage) => {
+      return sum + (CELLS[`${lane.id}__${stage.id}`] || []).length;
+    }, 0);
+
+    const labelEl = document.createElement('div');
+    labelEl.className = `lane-label`;
+    labelEl.dataset.lane = lane.id;
+    labelEl.innerHTML = `
+      <div class="lane-label-toggle-col">
+        <span class="lane-toggle">−</span>
+      </div>
+      <div class="lane-label-content">
+        <div>
+          <div class="lane-num">${lane.num}</div>
+          <div class="lane-name" data-count="${itemCount}">${lane.name}</div>
+        </div>
+        <div class="lane-meta">
+          <span>${lane.meta}</span>
+          <span style="font-family: var(--mono); opacity: 0.5;">${itemCount} items</span>
+        </div>
+      </div>
+    `;
+    labelEl.classList.add('lane-' + lane.id);
+    labelEl.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleLaneCollapse(lane.id);
+    });
+
+    // Wrap label + cells in a row using subgrid-like approach via class on each cell
+    // Actually we're using a flat grid, so we'll just tag every cell with lane id for filtering
+    journey.appendChild(labelEl);
+
+    STAGES.forEach(stage => {
+      const cellEl = document.createElement('div');
+      cellEl.className = 'cell';
+      cellEl.dataset.lane = lane.id;
+      cellEl.dataset.stage = stage.id;
+      const key = `${lane.id}__${stage.id}`;
+      const items = CELLS[key] || [];
+
+      if (lane.id === 'thoughts' && items[0] && items[0].emotion != null) {
+        const it = items[0];
+        cellEl.innerHTML = `
+          <div class="item" data-key="${key}" data-idx="0">
+            <div class="item-tag">${it.tag}</div>
+            <div>${it.text}</div>
+          </div>
+          <div class="emotion-bar">
+            <div class="emotion-marker" style="left:${it.emotion * 100}%" data-val="${Math.round(it.emotion * 100)}"></div>
+          </div>
+        `;
+      } else if (lane.id === 'pain') {
+        cellEl.innerHTML = items.map((it, idx) => `
+          <div class="item" data-key="${key}" data-idx="${idx}" data-severity="${it.severity || 'med'}">
+            <div class="item-tag"><span class="pain-pip pain-${it.severity || 'med'}"></span>${it.tag}</div>
+            <div>${it.text}</div>
+          </div>
+        `).join('');
+      } else if (lane.id === 'opportunity') {
+        cellEl.innerHTML = items.map((it, idx) => `
+          <div class="item item-opportunity" data-key="${key}" data-idx="${idx}" data-impact="${it.impact || 'med'}">
+            <div class="item-tag"><span class="opp-pip opp-${it.impact || 'med'}"></span>${it.tag} · ${it.impact || 'med'} impact</div>
+            <div>${it.text}</div>
+          </div>
+        `).join('');
+      } else if (lane.id === 'initiatives') {
+        cellEl.innerHTML = items.map((it, idx) => `
+          <div class="item item-initiative" data-key="${key}" data-idx="${idx}" data-status="${it.status || 'planned'}">
+            <div class="item-tag"><span class="status-pip status-${it.status || 'planned'}"></span>${it.tag}</div>
+            <div>${it.text}</div>
+          </div>
+        `).join('');
+      } else {
+        cellEl.innerHTML = items.map((it, idx) => `
+          <div class="item" data-key="${key}" data-idx="${idx}">
+            <div class="item-tag">${it.tag}</div>
+            <div>${it.text}</div>
+          </div>
+        `).join('');
+      }
+
+      cellEl.querySelectorAll('.item').forEach(itemEl => {
+        itemEl.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openDrawer(lane, stage, itemEl.dataset.key, parseInt(itemEl.dataset.idx));
+        });
+      });
+
+      journey.appendChild(cellEl);
+    });
+  });
+}
+
+function buildStageKpiBar() {
+  const wrap = document.getElementById('stagekpi-cells');
+  STAGES.forEach((s, i) => {
+    const k = STAGE_KPIS[i];
+    const cell = document.createElement('div');
+    cell.className = 'stagekpi-cell';
+    cell.dataset.idx = i;
+    cell.dataset.stage = s.id;
+    cell.innerHTML = `
+      <div class="stagekpi-head">
+        <span class="num">${s.num}</span>
+        <span class="name">${s.name}</span>
+      </div>
+      <span class="stagekpi-expand">▾</span>
+      <div class="stagekpi-metric">
+        <div class="stagekpi-label">${k.label}</div>
+        <div class="stagekpi-value-row">
+          <span class="stagekpi-value kpi-num" data-idx="${i}">${formatKpi(k.base, k.unit)}</span>
+          <span class="stagekpi-unit">${k.unit}</span>
+          <span class="stagekpi-delta flat" data-idx="${i}">—</span>
+        </div>
+      </div>
+      <svg class="stagekpi-spark" viewBox="0 0 60 28" preserveAspectRatio="none">
+        <polyline points="${k.spark.map((v, idx) => {
+          const x = (idx / (k.spark.length - 1)) * 60;
+          const min = Math.min(...k.spark);
+          const max = Math.max(...k.spark);
+          const y = 26 - ((v - min) / (max - min || 1)) * 24;
+          return `${x},${y}`;
+        }).join(' ')}" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      </svg>
+    `;
+    cell.addEventListener('click', (e) => {
+      // Shift+click: jump to stage column. Plain click: open detail.
+      if (e.shiftKey) {
+        jumpToStage(i);
+      } else {
+        toggleKpiDetail(i);
+      }
+    });
+    wrap.appendChild(cell);
+  });
+  updateKpiHealth();
+}
+
+function formatKpi(v, unit) {
+  if (unit === 'k') return v.toFixed(0);
+  if (unit === '%') return v.toFixed(1);
+  if (unit === '') return v < 5 ? v.toFixed(2) : v.toFixed(0);
+  return v.toFixed(1);
+}
+
+function updateKpiHealth() {
+  document.querySelectorAll('.stagekpi-cell').forEach((cell, i) => {
+    const k = STAGE_KPIS[i];
+    const current = parseFloat(cell.querySelector('.kpi-num').textContent);
+    const ratio = current / k.base;
+    let health = 'warn';
+    if (ratio >= 1.0) health = 'good';
+    else if (ratio < 0.92) health = 'bad';
+    cell.dataset.health = health;
+  });
+}
+
+function toggleKpiDetail(idx) {
+  if (state.detailIdx === idx) {
+    closeKpiDetail();
+  } else {
+    state.detailIdx = idx;
+    document.querySelectorAll('.stagekpi-cell').forEach((c, i) => {
+      c.classList.toggle('expanded', i === idx);
+    });
+    document.getElementById('kpi-detail').classList.add('open');
+    document.getElementById('canvas-wrap').classList.add('detail-open');
+    renderKpiDetail(idx);
+    setTimeout(updateMinimap, 260);
+  }
+}
+
+function closeKpiDetail() {
+  state.detailIdx = null;
+  document.querySelectorAll('.stagekpi-cell').forEach(c => c.classList.remove('expanded'));
+  document.getElementById('kpi-detail').classList.remove('open');
+  document.getElementById('canvas-wrap').classList.remove('detail-open');
+  setTimeout(updateMinimap, 260);
+}
+
+function renderKpiDetail(idx) {
+  const stage = STAGES[idx];
+  const k = STAGE_KPIS[idx];
+  const inner = document.getElementById('kpi-detail-inner');
+  const current = parseFloat(document.querySelector(`.kpi-num[data-idx="${idx}"]`).textContent);
+  const pct = ((current - k.base) / k.base) * 100;
+  const deltaCls = Math.abs(pct) < 0.5 ? 'flat' : (pct > 0 ? 'up' : 'down');
+  const deltaSym = deltaCls === 'up' ? '▲' : (deltaCls === 'down' ? '▼' : '—');
+
+  // Build sparkline path that fills the detail chart area
+  const sparkW = 100, sparkH = 100;
+  const sparkPoints = k.spark.concat([current]); // append current value as last point
+  const sMin = Math.min(...sparkPoints);
+  const sMax = Math.max(...sparkPoints);
+  const path = sparkPoints.map((v, i) => {
+    const x = (i / (sparkPoints.length - 1)) * sparkW;
+    const y = sparkH - ((v - sMin) / (sMax - sMin || 1)) * (sparkH - 10) - 5;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+
+  // Mock additional context per stage
+  const mockBenchmark = (k.base * 0.94).toFixed(k.unit === '%' ? 1 : (k.base < 5 ? 2 : 0));
+  const mockTarget = (k.base * 1.08).toFixed(k.unit === '%' ? 1 : (k.base < 5 ? 2 : 0));
+
+  inner.innerHTML = `
+    <div class="kpi-detail-header">
+      <div class="kpi-detail-tag">${stage.num} · ${stage.meta}</div>
+      <div class="kpi-detail-title">${stage.name} · ${k.label}</div>
+      <div class="kpi-detail-big">
+        <span>${formatKpi(current, k.unit)}</span>
+        <span class="unit">${k.unit}</span>
+        <span class="stagekpi-delta ${deltaCls}" style="font-size: 14px; margin-left: 8px;">${deltaSym} ${Math.abs(pct).toFixed(1)}%</span>
+      </div>
+    </div>
+    <div>
+      <div class="kpi-detail-tag" style="margin-bottom: 8px;">Trend · last 6 periods</div>
+      <div class="kpi-detail-chart">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width:100%; height:100%; display:block;">
+          <polyline points="${path}" fill="none" stroke="var(--ink)" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+          <polyline points="${path} 100,100 0,100" fill="rgba(13,13,14,0.04)" stroke="none"/>
+        </svg>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-top: 4px; font-family: var(--mono); font-size: 9px; color: var(--neutral); letter-spacing: 0.1em;">
+        <span>−6 periods</span>
+        <span>NOW</span>
+      </div>
+    </div>
+    <div class="kpi-detail-side">
+      <div class="kpi-detail-tag">Context</div>
+      <div class="kpi-detail-stat">
+        <span class="k">Baseline</span>
+        <span class="v">${formatKpi(k.base, k.unit)}${k.unit}</span>
+      </div>
+      <div class="kpi-detail-stat">
+        <span class="k">Industry avg</span>
+        <span class="v">${mockBenchmark}${k.unit}</span>
+      </div>
+      <div class="kpi-detail-stat">
+        <span class="k">Q4 target</span>
+        <span class="v">${mockTarget}${k.unit}</span>
+      </div>
+      <div class="kpi-detail-stat">
+        <span class="k">Updated</span>
+        <span class="v" style="font-size: 11px;">just now</span>
+      </div>
+      <button class="chip" style="background: var(--ink); color: var(--paper); border-color: var(--ink); margin-top: 6px;" onclick="jumpToStage(${idx})">
+        Jump to ${stage.name} column →
+      </button>
+    </div>
+  `;
+}
+
+/* live mock KPI updates */
+function tickKpis() {
+  STAGE_KPIS.forEach((k, i) => {
+    const noise = (Math.random() - 0.4) * k.range * 0.3;
+    const newVal = Math.max(0, k.base + noise);
+    const numEl = document.querySelector(`.kpi-num[data-idx="${i}"]`);
+    const deltaEl = document.querySelector(`.stagekpi-delta[data-idx="${i}"]`);
+    if (!numEl) return;
+    const prev = parseFloat(numEl.textContent);
+    numEl.textContent = formatKpi(newVal, k.unit);
+    const diff = newVal - prev;
+    const pct = ((newVal - k.base) / k.base) * 100;
+    if (Math.abs(diff) < 0.01) {
+      deltaEl.className = 'stagekpi-delta flat';
+      deltaEl.textContent = '—';
+    } else if (diff > 0) {
+      deltaEl.className = 'stagekpi-delta up';
+      deltaEl.textContent = `▲${pct.toFixed(1)}%`;
+    } else {
+      deltaEl.className = 'stagekpi-delta down';
+      deltaEl.textContent = `▼${Math.abs(pct).toFixed(1)}%`;
+    }
+  });
+  updateKpiHealth();
+
+  // Refresh detail panel if it's currently open
+  if (state.detailIdx != null) {
+    renderKpiDetail(state.detailIdx);
+  }
+}
+
+/* =========================================================
+   INTERACTIONS — pan, zoom, lane toggle, drawer
+   ========================================================= */
+function applyTransform() {
+  const canvas = document.getElementById('canvas');
+  canvas.style.transform = `translate(${state.panX}px, ${state.panY}px) scale(${state.zoom})`;
+  document.getElementById('zoom-display').textContent = Math.round(state.zoom * 100) + '%';
+  updateMinimap();
+}
+
+function setZoom(z, cx, cy) {
+  const wrap = document.getElementById('canvas-wrap');
+  const rect = wrap.getBoundingClientRect();
+  cx = cx ?? rect.width / 2;
+  cy = cy ?? rect.height / 2;
+  const newZoom = Math.max(0.3, Math.min(2.5, z));
+  // adjust pan so the center stays in place
+  state.panX = cx - ((cx - state.panX) / state.zoom) * newZoom;
+  state.panY = cy - ((cy - state.panY) / state.zoom) * newZoom;
+  state.zoom = newZoom;
+  applyTransform();
+}
+
+function fitToScreen() {
+  const wrap = document.getElementById('canvas-wrap');
+  const journey = document.getElementById('journey');
+  const padding = 40;
+  const zx = (wrap.clientWidth - padding * 2) / journey.scrollWidth;
+  const zy = (wrap.clientHeight - padding * 2) / journey.scrollHeight;
+  state.zoom = Math.min(zx, zy, 1);
+  state.panX = padding;
+  state.panY = padding;
+  applyTransform();
+}
+
+function jumpToStage(idx) {
+  const wrap = document.getElementById('canvas-wrap');
+  // Each stage column is 280px wide, lane label is 220px
+  const targetX = -(220 + idx * 280) * state.zoom + 240;
+  state.panX = targetX;
+  applyTransform();
+}
+
+function toggleLaneCollapse(laneId) {
+  if (state.collapsedLanes.has(laneId)) state.collapsedLanes.delete(laneId);
+  else state.collapsedLanes.add(laneId);
+  refreshLaneVisibility();
+}
+
+function toggleLaneVisibility(laneId) {
+  if (state.hiddenLanes.has(laneId)) state.hiddenLanes.delete(laneId);
+  else state.hiddenLanes.add(laneId);
+  refreshLaneVisibility();
+}
+
+function refreshLaneVisibility() {
+  LANES.forEach(lane => {
+    const hidden = state.hiddenLanes.has(lane.id);
+    const collapsed = state.collapsedLanes.has(lane.id);
+
+    // Lane label
+    const labelEl = document.querySelector(`.lane-label[data-lane="${lane.id}"]`);
+    if (labelEl) {
+      labelEl.style.display = hidden ? 'none' : '';
+      labelEl.classList.toggle('collapsed', collapsed);
+    }
+
+    // Cells
+    document.querySelectorAll(`.cell[data-lane="${lane.id}"]`).forEach(cell => {
+      cell.style.display = hidden ? 'none' : '';
+      cell.classList.toggle('collapsed', collapsed);
+    });
+
+    // Toggle chip in top bar
+    const chip = document.querySelector(`[data-lane-toggle="${lane.id}"]`);
+    if (chip) chip.classList.toggle('active', !hidden);
+  });
+
+  // Update status bar
+  const visibleLanes = LANES.length - state.hiddenLanes.size;
+  const collapsedCount = state.collapsedLanes.size;
+  document.getElementById('status-lanes').textContent =
+    `${visibleLanes} visible${collapsedCount ? ` · ${collapsedCount} collapsed` : ''}`;
+
+  const visibleItems = document.querySelectorAll(
+    '.cell:not(.collapsed):not([style*="display: none"]) .item:not([style*="display: none"])'
+  ).length;
+  document.getElementById('status-items').textContent = `${visibleItems} items`;
+
+  // Recompute minimap since the canvas may have resized
+  setTimeout(updateMinimap, 260);
+
+  // Keep the global collapse/expand toggle label in sync
+  const toggleBtn = document.getElementById('collapse-toggle');
+  if (toggleBtn) {
+    const visibleLanes = LANES.filter(l => !state.hiddenLanes.has(l.id));
+    const allCollapsed = visibleLanes.length > 0 &&
+      visibleLanes.every(l => state.collapsedLanes.has(l.id));
+    if (allCollapsed) {
+      toggleBtn.innerHTML = '◣ Expand all';
+      toggleBtn.classList.add('active');
+    } else {
+      toggleBtn.innerHTML = '◢ Collapse all';
+      toggleBtn.classList.remove('active');
+    }
+  }
+}
+
+function applyFilter(filterId) {
+  state.filter = filterId;
+  document.querySelectorAll('[data-filter]').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.filter === filterId);
+  });
+
+  document.querySelectorAll('.item').forEach(item => {
+    let show = true;
+    if (filterId === 'critical') {
+      // High-severity pain points only
+      show = item.dataset.severity === 'high';
+    } else if (filterId === 'opportunity') {
+      // Items in the opportunity lane (high-impact ones first via styling, but show all)
+      show = item.classList.contains('item-opportunity');
+    } else if (filterId === 'active-initiatives') {
+      // Initiatives that are currently in-flight
+      show = item.classList.contains('item-initiative') && item.dataset.status === 'active';
+    }
+    item.style.display = show ? '' : 'none';
+  });
+
+  const visibleItems = document.querySelectorAll('.item:not([style*="display: none"])').length;
+  document.getElementById('status-items').textContent = `${visibleItems} items`;
+}
+
+function clearItemFocus() {
+  document.getElementById('journey').classList.remove('has-focus');
+  document.querySelectorAll('.is-focused').forEach(el => el.classList.remove('is-focused'));
+  document.querySelectorAll('.is-focus-row').forEach(el => el.classList.remove('is-focus-row'));
+  document.querySelectorAll('.is-focus-col').forEach(el => el.classList.remove('is-focus-col'));
+}
+
+function setItemFocus(laneId, stageId, key, idx) {
+  clearItemFocus();
+  const journey = document.getElementById('journey');
+  journey.classList.add('has-focus');
+
+  // Highlight the specific item
+  const itemEl = document.querySelector(
+    `.cell[data-lane="${laneId}"][data-stage="${stageId}"] .item[data-key="${key}"][data-idx="${idx}"]`
+  );
+  if (itemEl) itemEl.classList.add('is-focused');
+
+  // Highlight the entire row (all cells + label in this lane)
+  document.querySelectorAll(`.cell[data-lane="${laneId}"]`).forEach(c => c.classList.add('is-focus-row'));
+  const laneLabel = document.querySelector(`.lane-label[data-lane="${laneId}"]`);
+  if (laneLabel) laneLabel.classList.add('is-focus-row');
+
+  // Highlight the entire column (all cells + stage head in this stage)
+  document.querySelectorAll(`.cell[data-stage="${stageId}"]`).forEach(c => c.classList.add('is-focus-col'));
+  const stageHead = document.querySelector(`.stage-head[data-stage="${stageId}"]`);
+  if (stageHead) stageHead.classList.add('is-focus-col');
+
+  // Also highlight the matching KPI cell in the top bar
+  const kpiCell = document.querySelector(`.stagekpi-cell[data-stage="${stageId}"]`);
+  if (kpiCell) kpiCell.classList.add('is-focus-col');
+}
+
+function openDrawer(lane, stage, key, idx) {
+  const items = CELLS[key] || [];
+  const item = items[idx];
+  if (!item) return;
+
+  const drawer = document.getElementById('drawer');
+  document.getElementById('drawer-tag').textContent = `${stage.name} · ${lane.name}`;
+  document.getElementById('drawer-title').textContent = item.text;
+
+  // mock metrics
+  const mockMetrics = generateMockMetrics(lane.id, stage.id);
+
+  // Initiative-specific: link to the user flow page
+  const flowId = `${lane.id}__${stage.id}__${idx}`;
+  const flowSection = lane.id === 'initiatives' ? `
+    <div class="drawer-section drawer-flow-cta">
+      <h4>User Flow</h4>
+      <p style="margin: 0 0 12px; color: var(--neutral); font-size: 11px; line-height: 1.5;">
+        See the full step-by-step flow for this initiative, including decision points, success metrics, and step-level ownership.
+      </p>
+      <a href="initiative-flow.html?id=${flowId}" target="_blank" class="flow-link-btn">
+        <span class="flow-link-label">
+          <span class="flow-link-tag">${item.tag}</span>
+          <span class="flow-link-title">Open flow chart</span>
+        </span>
+        <span class="flow-link-arrow">→</span>
+      </a>
+      <p style="margin: 10px 0 0; font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--neutral); opacity: 0.7;">
+        Opens in new tab · ${item.status || 'planned'}
+      </p>
+    </div>
+  ` : '';
+
+  document.getElementById('drawer-body').innerHTML = `
+    <div class="drawer-section">
+      <h4>Context</h4>
+      <p style="margin:0">${getMockContext(lane.id, stage.id, item)}</p>
+    </div>
+    ${flowSection}
+    <div class="drawer-section">
+      <h4>Signal · Last 30 Days</h4>
+      ${mockMetrics.map(m => `
+        <div class="metric-row">
+          <span class="k">${m.label}</span>
+          <span class="v">${m.value}</span>
+        </div>
+      `).join('')}
+    </div>
+    <div class="drawer-section">
+      <h4>Connected Lanes</h4>
+      <p style="margin:0">${getConnectedLanes(lane.id, stage.id)}</p>
+    </div>
+    <div class="drawer-section">
+      <h4>Notes</h4>
+      <p style="margin:0; color: var(--neutral); font-style: italic">Add observations, research links, or hypotheses here. (Mock placeholder — wire to your CMS or notes API later.)</p>
+    </div>
+  `;
+
+  drawer.classList.add('open');
+  state.selected = { lane, stage, key, idx };
+  setItemFocus(lane.id, stage.id, key, idx);
+}
+
+function generateMockMetrics(laneId, stageId) {
+  const base = {
+    actions: [
+      { label: 'Volume', value: (Math.random() * 4000 + 1000).toFixed(0) },
+      { label: 'Completion rate', value: (Math.random() * 30 + 60).toFixed(1) + '%' },
+      { label: 'Time to complete', value: (Math.random() * 4 + 1).toFixed(1) + ' min' }
+    ],
+    touch: [
+      { label: 'Sessions', value: (Math.random() * 8000 + 2000).toFixed(0) },
+      { label: 'Bounce rate', value: (Math.random() * 30 + 20).toFixed(1) + '%' },
+      { label: 'CTR', value: (Math.random() * 8 + 2).toFixed(2) + '%' }
+    ],
+    thoughts: [
+      { label: 'Sentiment score', value: (Math.random() * 0.4 + 0.5).toFixed(2) },
+      { label: 'Survey responses', value: (Math.random() * 200 + 50).toFixed(0) },
+      { label: 'Verbatim count', value: (Math.random() * 80 + 20).toFixed(0) }
+    ],
+    backend: [
+      { label: 'Uptime', value: (99 + Math.random()).toFixed(2) + '%' },
+      { label: 'P95 latency', value: (Math.random() * 200 + 100).toFixed(0) + 'ms' },
+      { label: 'Error rate', value: (Math.random() * 0.5).toFixed(3) + '%' }
+    ],
+    team: [
+      { label: 'Owner', value: 'TBD' },
+      { label: 'Active tickets', value: (Math.random() * 30 + 5).toFixed(0) },
+      { label: 'Avg resolution', value: (Math.random() * 3 + 0.5).toFixed(1) + ' days' }
+    ],
+    pain: [
+      { label: 'Impact score', value: (Math.random() * 4 + 6).toFixed(1) + '/10' },
+      { label: 'Effort estimate', value: (Math.random() * 4 + 1).toFixed(0) + ' wk' },
+      { label: 'Affected users', value: (Math.random() * 40 + 10).toFixed(0) + '%' }
+    ],
+    opportunity: [
+      { label: 'Est. uplift', value: '+' + (Math.random() * 12 + 4).toFixed(1) + '%' },
+      { label: 'Reach', value: (Math.random() * 60 + 30).toFixed(0) + '% of users' },
+      { label: 'Effort estimate', value: (Math.random() * 6 + 2).toFixed(0) + ' wk' },
+      { label: 'Confidence', value: ['Low', 'Med', 'High'][Math.floor(Math.random() * 3)] }
+    ],
+    initiatives: [
+      { label: 'Progress', value: (Math.random() * 80 + 10).toFixed(0) + '%' },
+      { label: 'Sprint', value: 'Sprint ' + Math.floor(Math.random() * 6 + 1) },
+      { label: 'Squad', value: ['Growth', 'Onboarding', 'Platform', 'Lifecycle'][Math.floor(Math.random() * 4)] },
+      { label: 'Target date', value: ['Q3 2026', 'Q4 2026', 'Q1 2027'][Math.floor(Math.random() * 3)] }
+    ]
+  };
+  return base[laneId] || [];
+}
+
+function getMockContext(laneId, stageId, item) {
+  return `This is the ${item.tag.toLowerCase()} moment in the ${stageId} stage. Mock context placeholder — fill in with research synthesis, interview quotes, or analytics findings.`;
+}
+
+function getConnectedLanes(laneId, stageId) {
+  const connections = LANES
+    .filter(l => l.id !== laneId)
+    .slice(0, 2)
+    .map(l => l.name)
+    .join(' · ');
+  return connections;
+}
+
+function updateMinimap() {
+  const wrap = document.getElementById('canvas-wrap');
+  const journey = document.getElementById('journey');
+  const mvp = document.getElementById('minimap-viewport');
+  if (!journey.scrollWidth) return;
+
+  const totalW = journey.scrollWidth * state.zoom;
+  const totalH = journey.scrollHeight * state.zoom;
+  const viewW = wrap.clientWidth;
+  const viewH = wrap.clientHeight;
+
+  const scaleX = 180 / totalW;
+  const scaleY = 110 / totalH;
+  const scale = Math.min(scaleX, scaleY);
+
+  mvp.style.width = (viewW * scale) + 'px';
+  mvp.style.height = (viewH * scale) + 'px';
+  mvp.style.left = (-state.panX * scale) + 'px';
+  mvp.style.top = (-state.panY * scale) + 'px';
+}
+
+/* =========================================================
+   INIT
+   ========================================================= */
+function init() {
+  buildJourney();
+  buildStageKpiBar();
+
+  document.getElementById('status-stages').textContent = `${STAGES.length} stages`;
+  document.getElementById('status-lanes').textContent = `${LANES.length} lanes visible`;
+
+  const totalItems = Object.values(CELLS).reduce((sum, arr) => sum + arr.length, 0);
+  document.getElementById('status-items').textContent = `${totalItems} items`;
+
+  // KPI detail close
+  document.getElementById('kpi-detail-close').addEventListener('click', closeKpiDetail);
+
+  // PAN
+  const wrap = document.getElementById('canvas-wrap');
+  let isDragging = false;
+  let dragStartX = 0, dragStartY = 0, panStartX = 0, panStartY = 0;
+
+  wrap.addEventListener('mousedown', (e) => {
+    if (e.target.closest('.item')) return; // let item clicks through
+    isDragging = true;
+    wrap.classList.add('dragging');
+    dragStartX = e.clientX;
+    dragStartY = e.clientY;
+    panStartX = state.panX;
+    panStartY = state.panY;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    state.panX = panStartX + (e.clientX - dragStartX);
+    state.panY = panStartY + (e.clientY - dragStartY);
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    isDragging = false;
+    wrap.classList.remove('dragging');
+  });
+
+  // ZOOM via scroll
+  wrap.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const rect = wrap.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+    const delta = -e.deltaY * 0.001;
+    setZoom(state.zoom * (1 + delta), cx, cy);
+  }, { passive: false });
+
+  // Zoom buttons
+  document.getElementById('zoom-in').addEventListener('click', () => setZoom(state.zoom * 1.2));
+  document.getElementById('zoom-out').addEventListener('click', () => setZoom(state.zoom / 1.2));
+  document.getElementById('zoom-fit').addEventListener('click', fitToScreen);
+
+  // Lane chips
+  document.querySelectorAll('[data-lane-toggle]').forEach(chip => {
+    chip.addEventListener('click', () => toggleLaneVisibility(chip.dataset.laneToggle));
+  });
+
+  // Collapse/Expand all toggle
+  const collapseToggleBtn = document.getElementById('collapse-toggle');
+  function updateCollapseToggleLabel() {
+    // If all visible lanes are collapsed, show "Expand all". Otherwise "Collapse all".
+    const visibleLanes = LANES.filter(l => !state.hiddenLanes.has(l.id));
+    const allCollapsed = visibleLanes.length > 0 &&
+      visibleLanes.every(l => state.collapsedLanes.has(l.id));
+    if (allCollapsed) {
+      collapseToggleBtn.innerHTML = '◣ Expand all';
+      collapseToggleBtn.classList.add('active');
+    } else {
+      collapseToggleBtn.innerHTML = '◢ Collapse all';
+      collapseToggleBtn.classList.remove('active');
+    }
+  }
+  collapseToggleBtn.addEventListener('click', () => {
+    const visibleLanes = LANES.filter(l => !state.hiddenLanes.has(l.id));
+    const allCollapsed = visibleLanes.length > 0 &&
+      visibleLanes.every(l => state.collapsedLanes.has(l.id));
+    if (allCollapsed) {
+      state.collapsedLanes.clear();
+    } else {
+      LANES.forEach(l => state.collapsedLanes.add(l.id));
+    }
+    refreshLaneVisibility();
+    updateCollapseToggleLabel();
+  });
+
+  // Filter chips
+  document.querySelectorAll('[data-filter]').forEach(chip => {
+    chip.addEventListener('click', () => applyFilter(chip.dataset.filter));
+  });
+
+  // Drawer close
+  document.getElementById('drawer-close').addEventListener('click', () => {
+    document.getElementById('drawer').classList.remove('open');
+    clearItemFocus();
+    state.selected = null;
+  });
+
+  // Escape closes drawer / KPI detail
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const drawerOpen = document.getElementById('drawer').classList.contains('open');
+      if (drawerOpen) {
+        document.getElementById('drawer').classList.remove('open');
+        clearItemFocus();
+        state.selected = null;
+      } else if (state.detailIdx != null) {
+        closeKpiDetail();
+      }
+    }
+  });
+
+  // Live KPIs — tick every 2s
+  setInterval(tickKpis, 2200);
+
+  // Initial fit
+  setTimeout(() => {
+    fitToScreen();
+  }, 50);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

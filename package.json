@@ -9,6 +9,8 @@
     "lint": "eslint",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "journey:notion:push": "node scripts/sync-journey-atlas-notion.mjs push",
+    "journey:notion:pull": "node scripts/sync-journey-atlas-notion.mjs pull",
     "deploy:app": "vercel deploy --prod --yes --project storybook-demo --scope ruijiews-projects",
     "deploy:storybook": "vercel deploy --prod --yes --local-config vercel.storybook.json --project storybook-demo-ui --scope ruijiews-projects",
     "release:app": "npm run build && npm run deploy:app",

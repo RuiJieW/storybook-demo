@@ -35,6 +35,15 @@ export const labExperiments: readonly LabExperiment[] = [
     accentIndex: 1,
   },
   {
+    id: "user-journey",
+    title: "Journey Atlas",
+    description:
+      "Mandate lifecycle atlas with seven handoffs, governance signals, and progressive disclosure.",
+    href: "/user-journey",
+    status: "live",
+    accentIndex: 3,
+  },
+  {
     id: "design-spec",
     title: "Design system docs",
     description:

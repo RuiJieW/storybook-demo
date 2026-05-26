@@ -151,7 +151,7 @@ const statusVariant: Record<
 
 export function DashboardOverview() {
   return (
-    <div className="flex flex-1 flex-col gap-8 p-6 md:gap-12 md:p-8 lg:p-10">
+    <div className="flex min-h-0 flex-1 flex-col gap-8 overflow-y-auto p-6 md:gap-12 md:p-8 lg:p-10">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-2xl space-y-2">
           <h1 className="text-3xl font-medium tracking-tight text-foreground md:text-4xl lg:text-5xl">

@@ -7,6 +7,7 @@ import {
   BeakerIcon,
   BookOpenIcon,
   LayoutDashboardIcon,
+  MapIcon,
 } from "lucide-react"
 
 import { TobogganLogo } from "@/components/brand/toboggan-logo"
@@ -38,6 +39,7 @@ const labItem = {
 
 const experimentItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
+  { title: "Journey Atlas", href: "/user-journey", icon: MapIcon },
 ] as const
 
 function isNavActive(pathname: string, href: string) {

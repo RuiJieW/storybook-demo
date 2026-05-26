@@ -95,6 +95,10 @@
           "impact": { "type": "string", "enum": ["low", "med", "high"] },
           "status": { "type": "string", "enum": ["planned", "active", "shipped"] },
           "tier": { "type": ["string", "null"], "enum": ["tier-1", "tier-2", "tier-3", null] },
+          "developmentSubTrack": {
+            "type": "string",
+            "enum": ["design", "dev", "data-ai", "infra"]
+          },
           "archetypes": {
             "type": "array",
             "items": { "type": "string", "minLength": 1 }

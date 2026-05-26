@@ -3,6 +3,7 @@ export type JourneySeverity = "low" | "med" | "high"
 export type JourneyImpact = "low" | "med" | "high"
 export type JourneyStatus = "planned" | "active" | "shipped"
 export type JourneyTier = "tier-1" | "tier-2" | "tier-3"
+export type JourneyDevelopmentSubTrack = "design" | "dev" | "data-ai" | "infra"
 
 export type JourneyMeta = Readonly<{
   id: string
@@ -57,6 +58,8 @@ export type JourneyItem = Readonly<{
   tier?: JourneyTier | null
   archetypes?: string[]
   notionPageId?: string | null
+  /** Sub-track within the Development stage column (design, dev, data/AI, infra). */
+  developmentSubTrack?: JourneyDevelopmentSubTrack
   evidence: JourneyEvidence
 }>
 

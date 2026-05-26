@@ -12,6 +12,7 @@ import {
   journeyAtlasColumnCellClassName,
   journeyAtlasGridClassName,
   journeyAtlasGridTemplateColumns,
+  journeyAtlasStageColumnCellClassName,
 } from "@/components/journey-atlas/journey-atlas-layout"
 import { cn } from "@/lib/utils"
 
@@ -65,7 +66,7 @@ export function JourneyKpiBar({
             onClick={() => onSelectHandoff(handoff.id)}
             className={cn(
               "group border-r border-border px-3 py-2.5 text-left transition-colors last:border-r-0 hover:bg-muted",
-              journeyAtlasColumnCellClassName,
+              journeyAtlasStageColumnCellClassName,
               activeHandoffId === handoff.id && "bg-background"
             )}
           >

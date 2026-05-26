@@ -6,11 +6,15 @@ import type { ReactNode } from "react"
 import { Badge } from "@/components/ui/badge"
 import {
   journeyAtlasColumnCellClassName,
+  journeyAtlasDevelopmentStageId,
+  journeyAtlasDevelopmentSubTracks,
   journeyAtlasGridClassName,
   journeyAtlasGridTemplateColumns,
+  journeyAtlasLaneRailStickyClassName,
 } from "@/components/journey-atlas/journey-atlas-layout"
 import { JourneyThoughtSentimentBar } from "@/components/journey-atlas/journey-thought-sentiment-bar"
 import type {
+  JourneyDevelopmentSubTrack,
   JourneyHandoff,
   JourneyItem,
   JourneyLane,
@@ -42,11 +46,40 @@ const toneByLaneId: Record<string, string> = {
   pain: "bg-destructive/5 border-destructive/25",
   opportunity: "bg-chart-5/8 border-chart-5/30",
   initiatives: "bg-primary/6 border-primary/20",
+  "open-questions": "bg-muted/40 border-border",
 }
 
 function getCellItems(items: JourneyItem[], laneId: string, handoffId: string) {
   return items.filter(
     (item) => item.laneId === laneId && item.handoffIds.includes(handoffId)
+  )
+}
+
+function getDevelopmentCellItems(
+  items: JourneyItem[],
+  laneId: string,
+  subTrack?: JourneyDevelopmentSubTrack
+) {
+  return items.filter((item) => {
+    if (item.laneId !== laneId || !item.handoffIds.includes(journeyAtlasDevelopmentStageId)) {
+      return false
+    }
+    if (subTrack === undefined) {
+      return item.developmentSubTrack === undefined
+    }
+    return item.developmentSubTrack === subTrack
+  })
+}
+
+function developmentCellHasSubTracks(items: JourneyItem[], laneId: string, handoffId: string) {
+  if (handoffId !== journeyAtlasDevelopmentStageId) {
+    return false
+  }
+  return items.some(
+    (item) =>
+      item.laneId === laneId &&
+      item.handoffIds.includes(journeyAtlasDevelopmentStageId) &&
+      item.developmentSubTrack !== undefined
   )
 }
 
@@ -124,12 +157,182 @@ function CollapsedLaneHandoffPlaceholder({
   )
 }
 
+function ItemCard({
+  item,
+  selectedItemId,
+  onSelectItem,
+  hideTierBadge = false,
+}: Readonly<{
+  item: JourneyItem
+  selectedItemId: string | null
+  onSelectItem: (item: JourneyItem) => void
+  hideTierBadge?: boolean
+}>) {
+  return (
+    <button
+      key={item.id}
+      type="button"
+      onClick={() => onSelectItem(item)}
+      className={cn(
+        "w-full max-w-[200px] rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
+        selectedItemId === item.id && "border-ring ring-1 ring-ring/45"
+      )}
+    >
+      <p className="line-clamp-3 text-xs leading-5 text-foreground">{item.text}</p>
+      <ItemMeta hideTierBadge={hideTierBadge} item={item} />
+    </button>
+  )
+}
+
+function DevelopmentLaneCell({
+  laneId,
+  items,
+  selectedItemId,
+  onSelectItem,
+  hideTierBadge = false,
+}: Readonly<{
+  laneId: string
+  items: JourneyItem[]
+  selectedItemId: string | null
+  onSelectItem: (item: JourneyItem) => void
+  hideTierBadge?: boolean
+}>) {
+  const hasSubTracks = developmentCellHasSubTracks(items, laneId, journeyAtlasDevelopmentStageId)
+  const untracked = getDevelopmentCellItems(items, laneId)
+
+  if (!hasSubTracks) {
+    if (untracked.length === 0) {
+      return <p className="text-xs text-muted-foreground">No mapped evidence yet.</p>
+    }
+    return (
+      <div className="flex w-full flex-col gap-2">
+        {untracked.map((item) => (
+          <ItemCard
+            key={item.id}
+            item={item}
+            selectedItemId={selectedItemId}
+            onSelectItem={onSelectItem}
+            hideTierBadge={hideTierBadge}
+          />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className="grid w-full gap-2.5 md:grid-cols-4">
+      {journeyAtlasDevelopmentSubTracks.map((track) => {
+        const trackItems = getDevelopmentCellItems(items, laneId, track.id)
+        return (
+          <div key={track.id} className={cn("rounded-md border p-2", track.tone)}>
+            <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+              {track.label}
+            </p>
+            {trackItems.length === 0 ? (
+              <p className="py-1 text-[11px] leading-snug text-muted-foreground">—</p>
+            ) : (
+              <div className="flex flex-col gap-1.5">
+                {trackItems.map((item) => (
+                  <ItemCard
+                    key={item.id}
+                    item={item}
+                    selectedItemId={selectedItemId}
+                    onSelectItem={onSelectItem}
+                    hideTierBadge={hideTierBadge}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
+      {untracked.length > 0 ? (
+        <div className="rounded-md border border-border/70 bg-background/60 p-2 md:col-span-4">
+          <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            Cross-track
+          </p>
+          <div className="flex flex-col gap-1.5">
+            {untracked.map((item) => (
+              <ItemCard
+                key={item.id}
+                item={item}
+                selectedItemId={selectedItemId}
+                onSelectItem={onSelectItem}
+                hideTierBadge={hideTierBadge}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
+function LaneCellContent({
+  lane,
+  handoff,
+  cellItems,
+  items,
+  thoughtSentiments,
+  selectedItemId,
+  onSelectItem,
+  hideTierBadge = false,
+}: Readonly<{
+  lane: JourneyLane
+  handoff: JourneyHandoff
+  cellItems: JourneyItem[]
+  items: JourneyItem[]
+  thoughtSentiments?: Readonly<Partial<Record<string, number>>>
+  selectedItemId: string | null
+  onSelectItem: (item: JourneyItem) => void
+  hideTierBadge?: boolean
+}>) {
+  if (lane.id === "thoughts") {
+    return null
+  }
+
+  if (handoff.id === journeyAtlasDevelopmentStageId) {
+    return (
+      <DevelopmentLaneCell
+        laneId={lane.id}
+        items={items}
+        selectedItemId={selectedItemId}
+        onSelectItem={onSelectItem}
+        hideTierBadge={hideTierBadge}
+      />
+    )
+  }
+
+  if (cellItems.length === 0) {
+    return <p className="text-xs text-muted-foreground">No mapped evidence yet.</p>
+  }
+
+  return (
+    <div className="flex w-full flex-col gap-2">
+      {cellItems.map((item) => (
+        <ItemCard
+          key={item.id}
+          item={item}
+          selectedItemId={selectedItemId}
+          onSelectItem={onSelectItem}
+          hideTierBadge={hideTierBadge}
+        />
+      ))}
+    </div>
+  )
+}
+
 function ItemMeta({
   item,
   hideTierBadge = false,
 }: Readonly<{ item: JourneyItem; hideTierBadge?: boolean }>) {
   const isCritical = item.severity === "high"
   const isActiveInitiative = item.status === "active"
+  const tierBadgeLabel = item.tier ? item.tier.replace("-", " ") : null
+  const normalizedTierLabel = tierBadgeLabel?.replace(/[\s_-]+/g, "").toLowerCase()
+  const normalizedTagLabel = item.tag.replace(/[\s_-]+/g, "").toLowerCase()
+  const hasDuplicateTierTag =
+    normalizedTierLabel !== undefined && normalizedTierLabel === normalizedTagLabel
 
   return (
     <div className="flex flex-wrap items-center gap-1 pt-1">
@@ -141,9 +344,14 @@ function ItemMeta({
           {item.evidence.mentionCount} mentions
         </Badge>
       ) : null}
-      {item.tier && !hideTierBadge ? (
+      {item.tier && !hideTierBadge && !hasDuplicateTierTag ? (
         <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase">
-          {item.tier.replace("-", " ")}
+          {tierBadgeLabel}
+        </Badge>
+      ) : null}
+      {item.developmentSubTrack ? (
+        <Badge variant="outline" className="h-5 px-1.5 text-[10px] uppercase">
+          {item.developmentSubTrack}
         </Badge>
       ) : null}
       {isCritical ? (
@@ -281,7 +489,8 @@ function OpportunityLaneTierRows({
         <div
           className={cn(
             journeyAtlasColumnCellClassName,
-            "sticky left-0 z-20 border-r border-b border-border bg-background px-3 py-2",
+            journeyAtlasLaneRailStickyClassName,
+            "z-20 border-b px-3 py-2",
             activeLaneId === lane.id && "bg-primary/8"
           )}
         >
@@ -322,7 +531,8 @@ function OpportunityLaneTierRows({
           <div
             className={cn(
               journeyAtlasColumnCellClassName,
-              "sticky left-0 z-20 border-r border-b border-border bg-background px-3 py-3",
+              journeyAtlasLaneRailStickyClassName,
+              "z-20 border-b px-3 py-3",
               bandIndex > 0 && "border-t border-border",
               activeLaneId === lane.id && "bg-primary/8"
             )}
@@ -422,7 +632,7 @@ function OpportunityTierBandCell({
           type="button"
           onClick={() => onSelectItem(item)}
           className={cn(
-            "w-full rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
+            "w-full max-w-[200px] rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
             selectedItemId === item.id && "border-ring ring-1 ring-ring/45"
           )}
         >
@@ -476,14 +686,15 @@ export function JourneyGrid({
     <div
       className={cn(
         journeyAtlasGridClassName,
-        "overflow-hidden rounded-xl border-2 border-border bg-background shadow-sm"
+        "rounded-xl border-2 border-border bg-background shadow-sm"
       )}
       style={{ gridTemplateColumns: journeyAtlasGridTemplateColumns }}
     >
       <div
         className={cn(
           journeyAtlasColumnCellClassName,
-          "sticky left-0 z-[30] flex items-end md:min-h-[9.25rem]",
+          journeyAtlasLaneRailStickyClassName,
+          "z-[30] flex items-end md:min-h-[9.25rem]",
           stageHeaderTone
         )}
       >
@@ -522,28 +733,74 @@ export function JourneyGrid({
                   <p className="mt-1.5 font-heading text-lg font-semibold leading-snug tracking-tight text-primary-foreground sm:text-xl">
                     {stage.name}
                   </p>
+                  {stage.meta ? (
+                    <p className="mt-2 text-[12px] leading-snug text-primary-foreground/75">
+                      {stage.meta}
+                    </p>
+                  ) : null}
                 </>
               ) : (
                 <p className="font-heading text-lg font-semibold tracking-tight text-primary-foreground sm:text-xl">
-                  Handoff
+                  Stage
                 </p>
               )}
-              <p className="mt-3 border-t border-primary-foreground/25 pt-3 text-[13px] font-medium leading-snug text-primary-foreground/95">
+              <p className="mt-3 border-t border-primary-foreground/25 pt-3 text-[11px] font-medium leading-snug text-primary-foreground/80">
                 {handoff.name}
               </p>
-              <p className="mt-2 text-[11px] leading-relaxed text-primary-foreground/65">
+              <p className="mt-1.5 text-[11px] leading-relaxed text-primary-foreground/60">
                 {handoff.evidenceCount} interviews
-                {stage?.meta ? (
-                  <>
-                    <span aria-hidden className="text-primary-foreground/35">
-                      {" "}
-                      ·{" "}
-                    </span>
-                    {stage.meta}
-                  </>
-                ) : null}
               </p>
             </div>
+          </div>
+        )
+      })}
+
+      <div
+        className={cn(
+          journeyAtlasColumnCellClassName,
+          journeyAtlasLaneRailStickyClassName,
+          "z-[26] border-b bg-card px-3 py-2.5"
+        )}
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Dev tracks
+        </p>
+        <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground">
+          Inside Development
+        </p>
+      </div>
+
+      {handoffs.map((handoff, index) => {
+        const isDevelopment = handoff.id === journeyAtlasDevelopmentStageId
+        const isActive = activeHandoffId === handoff.id
+
+        return (
+          <div
+            key={`dev-tracks-${handoff.id}`}
+            className={cn(
+              journeyAtlasColumnCellClassName,
+              "border-r border-b border-border bg-muted/20 px-2 py-2 align-top last:border-r-0",
+              index === handoffs.length - 1 && "!border-r-0",
+              isActive && "ring-1 ring-ring/35 ring-inset"
+            )}
+          >
+            {isDevelopment ? (
+              <div className="grid grid-cols-4 gap-1.5">
+                {journeyAtlasDevelopmentSubTracks.map((track) => (
+                  <div
+                    key={track.id}
+                    className={cn(
+                      "rounded border px-2 py-1.5 text-[10px] font-medium leading-tight text-foreground",
+                      track.tone
+                    )}
+                  >
+                    {track.label}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="py-1 text-center text-[10px] text-muted-foreground">—</p>
+            )}
           </div>
         )
       })}
@@ -569,7 +826,8 @@ export function JourneyGrid({
             <div
               className={cn(
                 journeyAtlasColumnCellClassName,
-                "sticky left-0 z-20 border-r border-b border-border bg-background px-3 py-2",
+                journeyAtlasLaneRailStickyClassName,
+                "z-20 border-b px-3 py-2",
                 activeLaneId === lane.id && "bg-primary/8"
               )}
             >
@@ -600,7 +858,8 @@ export function JourneyGrid({
             <div
               className={cn(
                 journeyAtlasColumnCellClassName,
-                "sticky left-0 z-20 border-r border-b border-border bg-background px-3 py-3",
+                journeyAtlasLaneRailStickyClassName,
+                "z-20 border-b px-3 py-3",
                 activeLaneId === lane.id && "bg-primary/8"
               )}
             >
@@ -641,29 +900,16 @@ export function JourneyGrid({
                       handoffLabel={handoff.name}
                       value={thoughtSentimentFromMap(thoughtSentiments, handoff.id)}
                     />
-                  ) : null}
-
-                  {cellItems.length === 0 ? (
-                    <p className="text-xs text-muted-foreground">No mapped evidence yet.</p>
                   ) : (
-                    <div className="flex w-full flex-col gap-2">
-                      {cellItems.map((item) => (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => onSelectItem(item)}
-                          className={cn(
-                            "w-full rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
-                            selectedItemId === item.id && "border-ring ring-1 ring-ring/45"
-                          )}
-                        >
-                          <p className="line-clamp-3 text-xs leading-5 text-foreground">
-                            {item.text}
-                          </p>
-                          <ItemMeta item={item} />
-                        </button>
-                      ))}
-                    </div>
+                    <LaneCellContent
+                      lane={lane}
+                      handoff={handoff}
+                      cellItems={cellItems}
+                      items={items}
+                      thoughtSentiments={thoughtSentiments}
+                      selectedItemId={selectedItemId}
+                      onSelectItem={onSelectItem}
+                    />
                   )}
                 </div>
               )

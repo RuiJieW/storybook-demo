@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 
 import { JourneyGrid } from "@/components/journey-atlas/journey-grid"
 import { JourneyKpiBar } from "@/components/journey-atlas/journey-kpi-bar"
@@ -89,9 +89,10 @@ export function JourneyAtlas({
   const [activeHandoffId, setActiveHandoffId] = useState<string | null>(handoffs[0]?.id ?? null)
   const [selectedLocalItemId, setSelectedLocalItemId] = useState<string | null>(null)
   const [kpiDetailOpen, setKpiDetailOpen] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
   const {
     viewport,
-    transformStyle,
+    zoomStyle,
     zoomIn,
     zoomOut,
     fitToScreen,
@@ -99,7 +100,7 @@ export function JourneyAtlas({
     onDrag,
     endDrag,
     setZoom,
-  } = useJourneyViewport()
+  } = useJourneyViewport(scrollRef)
 
   const filteredItems = useMemo(
     () => data.items.filter((item) => matchesFilter(item, filter)),
@@ -158,6 +159,8 @@ export function JourneyAtlas({
       </div>
 
       <div
+        ref={scrollRef}
+        style={zoomStyle}
         className="relative min-h-0 flex-1 overflow-auto [background-color:var(--background)] [background-image:radial-gradient(circle_at_center,color-mix(in_oklab,var(--foreground)_10%,transparent)_1.25px,transparent_1.25px)] [background-size:20px_20px]"
         onMouseMove={(event) => {
           if ((event.buttons & 1) === 1) {
@@ -176,14 +179,13 @@ export function JourneyAtlas({
         }}
       >
         <div
-          className="inline-block cursor-grab p-4 active:cursor-grabbing"
+          className="inline-block min-w-max cursor-grab p-4 active:cursor-grabbing"
           onMouseDown={(event) => {
             if (event.button !== 0) {
               return
             }
             startDrag(event.clientX, event.clientY)
           }}
-          style={transformStyle}
         >
           <JourneyGrid
             stages={stages}

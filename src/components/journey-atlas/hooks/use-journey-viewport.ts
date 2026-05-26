@@ -1,11 +1,9 @@
 "use client"
 
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useRef, useState, type RefObject } from "react"
 
 type ViewportState = Readonly<{
   zoom: number
-  panX: number
-  panY: number
 }>
 
 const MIN_ZOOM = 0.65
@@ -15,21 +13,13 @@ function clampZoom(value: number) {
   return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, value))
 }
 
-export function useJourneyViewport() {
+export function useJourneyViewport(
+  scrollRef?: RefObject<HTMLElement | null>
+) {
   const [viewport, setViewport] = useState<ViewportState>({
     zoom: 1,
-    panX: 0,
-    panY: 0,
   })
   const dragRef = useRef<Readonly<{ x: number; y: number }> | null>(null)
-
-  const applyPan = useCallback((deltaX: number, deltaY: number) => {
-    setViewport((current) => ({
-      ...current,
-      panX: current.panX + deltaX,
-      panY: current.panY + deltaY,
-    }))
-  }, [])
 
   const setZoom = useCallback((value: number) => {
     setViewport((current) => ({
@@ -53,12 +43,13 @@ export function useJourneyViewport() {
   }, [])
 
   const fitToScreen = useCallback(() => {
-    setViewport({
-      zoom: 1,
-      panX: 0,
-      panY: 0,
-    })
-  }, [])
+    setViewport({ zoom: 1 })
+    const scrollEl = scrollRef?.current
+    if (scrollEl) {
+      scrollEl.scrollLeft = 0
+      scrollEl.scrollTop = 0
+    }
+  }, [scrollRef])
 
   const startDrag = useCallback((x: number, y: number) => {
     dragRef.current = { x, y }
@@ -73,26 +64,30 @@ export function useJourneyViewport() {
       const deltaX = x - dragRef.current.x
       const deltaY = y - dragRef.current.y
       dragRef.current = { x, y }
-      applyPan(deltaX, deltaY)
+
+      const scrollEl = scrollRef?.current
+      if (scrollEl) {
+        scrollEl.scrollLeft -= deltaX
+        scrollEl.scrollTop -= deltaY
+      }
     },
-    [applyPan]
+    [scrollRef]
   )
 
   const endDrag = useCallback(() => {
     dragRef.current = null
   }, [])
 
-  const transformStyle = useMemo(
+  const zoomStyle = useMemo(
     () => ({
-      transform: `translate(${viewport.panX}px, ${viewport.panY}px) scale(${viewport.zoom})`,
-      transformOrigin: "0 0",
+      zoom: viewport.zoom,
     }),
-    [viewport.panX, viewport.panY, viewport.zoom]
+    [viewport.zoom]
   )
 
   return {
     viewport,
-    transformStyle,
+    zoomStyle,
     setZoom,
     zoomIn,
     zoomOut,

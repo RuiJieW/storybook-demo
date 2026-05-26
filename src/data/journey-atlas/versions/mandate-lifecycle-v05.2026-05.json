@@ -10,149 +10,279 @@
   },
   "stages": [
     {
-      "id": "discover",
+      "id": "sales",
       "num": "01",
-      "name": "Discover / Align",
+      "name": "Sales",
       "order": 1,
-      "meta": "Sales → Discovery → mandate kickoff"
+      "meta": "Scoping, pitching, contract shape"
     },
     {
-      "id": "design",
+      "id": "discovery",
       "num": "02",
-      "name": "Design & Prototype",
+      "name": "Discovery",
       "order": 2,
-      "meta": "Design / prototype before production commitment"
+      "meta": "Research, scope alignment, strategy with SME/client"
     },
     {
-      "id": "build",
+      "id": "start-mandate",
       "num": "03",
-      "name": "Build & Integrate",
+      "name": "Start Mandate",
       "order": 3,
-      "meta": "Design → Dev and AI → Dev handoffs"
+      "meta": "Project charter, kickoff, setup, context registry seeding"
     },
     {
-      "id": "validate",
+      "id": "development",
       "num": "04",
-      "name": "Validate & Ship",
+      "name": "Development",
       "order": 4,
-      "meta": "Dev → Infra, QA / live"
+      "meta": "Parallel tracks — design, dev, data/AI (high-handoff zone)"
     },
     {
-      "id": "operate",
+      "id": "deploy",
       "num": "05",
-      "name": "Operate & Learn",
+      "name": "Deploy",
       "order": 5,
-      "meta": "Skills, telemetry, cross-discipline workflows"
+      "meta": "QA, live rollout, instrumentation"
     },
     {
-      "id": "evolve",
+      "id": "end-of-mandate",
       "num": "06",
-      "name": "Evolve & Extend",
+      "name": "End of Mandate",
       "order": 6,
-      "meta": "Retro, EOP, upsell, next mandate"
+      "meta": "EOP checklist, retro, upsell"
     }
   ],
   "handoffs": [
     {
-      "id": "sales-impl",
-      "name": "Sales → Implementation",
+      "id": "sales",
+      "name": "Sales → Discovery",
       "order": 1,
-      "lifecycleStageId": "discover",
+      "lifecycleStageId": "sales",
       "evidenceCount": 1,
-      "description": "Commercial and discovery context translated into implementation-ready signals."
+      "description": "Commercial context translated into discovery-ready scope signals."
     },
     {
-      "id": "design-ai",
-      "name": "Design → AI/Data",
+      "id": "discovery",
+      "name": "Discovery → Start Mandate",
       "order": 2,
-      "lifecycleStageId": "design",
-      "evidenceCount": 2,
-      "description": "Design intent and constraints informing downstream AI systems."
+      "lifecycleStageId": "discovery",
+      "evidenceCount": 4,
+      "description": "Research and SME alignment crystallize into mandate charter inputs."
     },
     {
-      "id": "design-dev",
-      "name": "Design → Dev",
+      "id": "start-mandate",
+      "name": "Kickoff → Development",
       "order": 3,
-      "lifecycleStageId": "build",
-      "evidenceCount": 9,
-      "description": "Design artifacts reaching production engineering without translation debt."
-    },
-    {
-      "id": "ai-dev",
-      "name": "AI/Data Science → Dev",
-      "order": 4,
-      "lifecycleStageId": "build",
-      "evidenceCount": 6,
-      "description": "Notebook and model work handed to engineering through stable API contracts."
-    },
-    {
-      "id": "dev-infra",
-      "name": "Dev → Infra/DevOps",
-      "order": 5,
-      "lifecycleStageId": "validate",
-      "evidenceCount": 3,
-      "description": "Product implementation crossing into deployment and operations surfaces."
-    },
-    {
-      "id": "skill-teammate",
-      "name": "AI Skill → Teammate",
-      "order": 6,
-      "lifecycleStageId": "operate",
+      "lifecycleStageId": "start-mandate",
       "evidenceCount": 5,
-      "description": "Operational workflows encoded as reusable skills across disciplines."
+      "description": "Registry seeding and setup scaffolding before parallel build tracks."
     },
     {
-      "id": "eop-retro",
-      "name": "Project → EOP / Retro / Upsell",
-      "order": 7,
-      "lifecycleStageId": "evolve",
+      "id": "development",
+      "name": "Development → Deploy",
+      "order": 4,
+      "lifecycleStageId": "development",
+      "evidenceCount": 9,
+      "description": "Design, dev, and data/AI tracks converge for production handoff."
+    },
+    {
+      "id": "deploy",
+      "name": "Deploy → End of Mandate",
+      "order": 5,
+      "lifecycleStageId": "deploy",
+      "evidenceCount": 3,
+      "description": "Live rollout, QA sign-off, and instrumentation before wrap-up."
+    },
+    {
+      "id": "end-of-mandate",
+      "name": "Mandate → Next mandate",
+      "order": 6,
+      "lifecycleStageId": "end-of-mandate",
       "evidenceCount": 1,
-      "description": "End-of-project synthesis that informs retros, funding, and follow-on work."
+      "description": "Retro, EOP synthesis, and upsell loop into the next engagement."
     }
   ],
   "lanes": [
-    { "id": "actions", "name": "Actions", "order": 1, "description": "Observed team moves by handoff." },
-    { "id": "touchpoints", "name": "Touchpoints", "order": 2, "description": "Artifacts and systems touched in each handoff." },
-    { "id": "thoughts", "name": "Thoughts", "order": 3, "description": "Tensions and sentiment signals from interviews." },
-    { "id": "backend", "name": "Backend", "order": 4, "description": "Infrastructure and tooling dependencies." },
-    { "id": "team", "name": "Team", "order": 5, "description": "Primary owners and coordination shape." },
-    { "id": "pain", "name": "Pain", "order": 6, "description": "Ranked constraints from synthesis section 6." },
-    { "id": "opportunity", "name": "Opportunity", "order": 7, "description": "Ranked leverage points from synthesis section 7." },
-    { "id": "initiatives", "name": "Initiatives", "order": 8, "description": "Tiered recommendations sequenced for action." }
+    {
+      "id": "actions",
+      "name": "Actions",
+      "order": 1,
+      "description": "Roles & JTBD — who does what at each phase."
+    },
+    {
+      "id": "touchpoints",
+      "name": "Touchpoints",
+      "order": 2,
+      "description": "Artifacts and systems touched in each phase."
+    },
+    {
+      "id": "thoughts",
+      "name": "Thoughts",
+      "order": 3,
+      "description": "Tensions and sentiment signals from interviews."
+    },
+    {
+      "id": "backend",
+      "name": "Backend",
+      "order": 4,
+      "description": "Infrastructure and tooling dependencies."
+    },
+    {
+      "id": "team",
+      "name": "Team",
+      "order": 5,
+      "description": "Primary owners and coordination shape."
+    },
+    {
+      "id": "pain",
+      "name": "Pain",
+      "order": 6,
+      "description": "Ranked constraints from synthesis section 6."
+    },
+    {
+      "id": "opportunity",
+      "name": "Opportunity",
+      "order": 7,
+      "description": "Ranked leverage points from synthesis section 7."
+    },
+    {
+      "id": "open-questions",
+      "name": "Open questions",
+      "order": 8,
+      "description": "Unresolved tensions and next-step decisions."
+    },
+    {
+      "id": "initiatives",
+      "name": "Initiatives",
+      "order": 9,
+      "description": "Tiered recommendations sequenced for action."
+    }
   ],
   "items": [
     {
-      "id": "action-bundle-handoff",
+      "id": "action-sales-pl",
       "laneId": "actions",
-      "handoffIds": ["design-dev"],
-      "tag": "Action",
-      "text": "Ship a handoff bundle with prototype URL, repo branch, and token references before dev implementation starts.",
+      "handoffIds": ["sales"],
+      "tag": "Role",
+      "text": "PL / Sales — pitch, scope shape; read client AI literacy before committing to spec fidelity.",
       "evidence": {
-        "mentionCount": 9,
-        "interviews": ["Birches retro", "Guy", "Dmitry", "Elodie", "Claire"],
-        "projects": ["Birches", "Unlocked Labs", "Gates"],
-        "sourceSections": ["4", "5A", "6"]
+        "mentionCount": 2,
+        "interviews": ["Chris", "LP"],
+        "projects": ["Convoy"],
+        "sourceSections": ["4", "8"]
       }
     },
     {
-      "id": "action-api-first",
+      "id": "action-discovery-roles",
       "laneId": "actions",
-      "handoffIds": ["ai-dev"],
-      "tag": "Action",
-      "text": "Lock API contracts early while model calibration continues so FE work can start without blocking.",
+      "handoffIds": ["discovery"],
+      "tag": "Role",
+      "text": "PL runs interviews and scope; Designer builds research prototype and glossary; Researcher runs sessions and synthesis; SMEs own rubric and terminology.",
+      "evidence": {
+        "mentionCount": 4,
+        "interviews": ["Adel", "Adrienne"],
+        "projects": ["Gates"],
+        "sourceSections": ["4", "5A"]
+      }
+    },
+    {
+      "id": "action-kickoff-roles",
+      "laneId": "actions",
+      "handoffIds": ["start-mandate"],
+      "tag": "Role",
+      "text": "Engineer runs setup skill and CLAUDE.md bootstrap; PL seeds charter and context registry; Designer authors design.md and tokens; provision repos under Toboggan org.",
+      "evidence": {
+        "mentionCount": 5,
+        "interviews": ["Guy", "Claire", "Dmitry"],
+        "projects": ["Unlocked Labs", "Proof"],
+        "sourceSections": ["4", "7", "9"]
+      }
+    },
+    {
+      "id": "action-dev-design",
+      "laneId": "actions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
+      "tag": "Role",
+      "text": "Designer — prototype, spec, meta-prompt workflow; ships handoff bundle before dev implementation starts.",
+      "evidence": {
+        "mentionCount": 9,
+        "interviews": ["Dmitry", "Claire", "Guy"],
+        "projects": ["Birches", "Gates"],
+        "sourceSections": ["4", "5A"]
+      }
+    },
+    {
+      "id": "action-dev-engineering",
+      "laneId": "actions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "dev",
+      "tag": "Role",
+      "text": "Dev — integration, PR review; co-owns feasibility with designer and validates prototype-to-production translation.",
+      "evidence": {
+        "mentionCount": 9,
+        "interviews": ["Dmitry", "Elodie", "Rob"],
+        "sourceSections": ["4", "5A", "5B"]
+      }
+    },
+    {
+      "id": "action-dev-ai",
+      "laneId": "actions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
+      "tag": "Role",
+      "text": "AI Engineer — calibration and eval loop; Data Scientist — notebooks and rubrics; lock API contracts early while model work continues.",
       "evidence": {
         "mentionCount": 6,
         "interviews": ["Adel", "Arthur", "Elodie"],
-        "projects": ["Gates", "mRelief", "Elion"],
+        "projects": ["Gates", "mRelief"],
         "sourceSections": ["4", "5C"]
+      }
+    },
+    {
+      "id": "action-dev-infra",
+      "laneId": "actions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "infra",
+      "tag": "Role",
+      "text": "DevOps / Dev — Terraform and infra via agent; optional track emerging from dev handoffs.",
+      "evidence": {
+        "mentionCount": 3,
+        "interviews": ["Rob"],
+        "sourceSections": ["4", "5D"]
+      }
+    },
+    {
+      "id": "action-deploy-roles",
+      "laneId": "actions",
+      "handoffIds": ["deploy"],
+      "tag": "Role",
+      "text": "Dev deploys with feature flags; QA runs e2e and manual flow tests; PL signs off; internal cohort + PostHog as proxy QA.",
+      "evidence": {
+        "mentionCount": 3,
+        "interviews": ["Elodie", "Rob"],
+        "sourceSections": ["4", "6"]
+      }
+    },
+    {
+      "id": "action-eop-roles",
+      "laneId": "actions",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Role",
+      "text": "PL runs EOP checklist and weekly report; Designer / Dev lead retros and post-mortems; Sales drives upsell and next phase; SR&ED evidence collection.",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Chris", "LP"],
+        "sourceSections": ["4", "10"]
       }
     },
     {
       "id": "touchpoint-prototype-portal",
       "laneId": "touchpoints",
-      "handoffIds": ["design-dev", "design-ai"],
+      "handoffIds": ["development", "deploy"],
+      "developmentSubTrack": "design",
       "tag": "Artifact",
-      "text": "Use Vercel previews and prototype portals as visual version control for readiness stages.",
+      "text": "Vercel previews and prototype portals as visual version control for readiness stages.",
       "evidence": {
         "mentionCount": 3,
         "interviews": ["Claire", "Guy", "Adrienne"],
@@ -163,9 +293,9 @@
     {
       "id": "touchpoint-context-registry",
       "laneId": "touchpoints",
-      "handoffIds": ["skill-teammate", "design-dev", "ai-dev"],
+      "handoffIds": ["start-mandate", "development"],
       "tag": "Artifact",
-      "text": "Treat AGENTS.md, DESIGN.md, and DATA.MD as kickoff context registry artifacts for every mandate.",
+      "text": "AGENTS.md, DESIGN.md, and DATA.MD as kickoff context registry artifacts for every mandate.",
       "evidence": {
         "mentionCount": 7,
         "interviews": ["Guy Pt1", "Birches retro", "Dmitry", "LP", "Rob"],
@@ -174,9 +304,88 @@
       }
     },
     {
+      "id": "touchpoint-charter-notion",
+      "laneId": "touchpoints",
+      "handoffIds": ["start-mandate"],
+      "tag": "Artifact",
+      "text": "Project charter, kickoff deck, and Notion mandate hub seeded before development tracks spin up.",
+      "evidence": {
+        "mentionCount": 3,
+        "interviews": ["Guy", "Chris"],
+        "sourceSections": ["4", "9"]
+      }
+    },
+    {
+      "id": "touchpoint-glossary",
+      "laneId": "touchpoints",
+      "handoffIds": ["discovery", "development"],
+      "developmentSubTrack": "data-ai",
+      "tag": "Artifact",
+      "text": "Domain glossary and SME rubric docs — bootstrap in discovery, consumed by prompts and eval loops in development.",
+      "evidence": {
+        "mentionCount": 4,
+        "interviews": ["Adel", "Adrienne"],
+        "projects": ["Gates"],
+        "sourceSections": ["6", "7"]
+      }
+    },
+    {
+      "id": "touchpoint-storybook-figma",
+      "laneId": "touchpoints",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
+      "tag": "Artifact",
+      "text": "Figma, Storybook, and prototype repo as the design-to-dev source chain — drift here is the dominant pain surface.",
+      "evidence": {
+        "mentionCount": 7,
+        "interviews": ["Dmitry", "Claire"],
+        "projects": ["Birches"],
+        "sourceSections": ["5A", "6"]
+      }
+    },
+    {
+      "id": "touchpoint-notebooks-api",
+      "laneId": "touchpoints",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
+      "tag": "Artifact",
+      "text": "Jupyter notebooks, eval datasets, and API contract docs bridging data science to integrated production code.",
+      "evidence": {
+        "mentionCount": 6,
+        "interviews": ["Adel", "Arthur"],
+        "projects": ["Gates", "Elion"],
+        "sourceSections": ["5C"]
+      }
+    },
+    {
+      "id": "touchpoint-qa-posthog",
+      "laneId": "touchpoints",
+      "handoffIds": ["deploy"],
+      "tag": "System",
+      "text": "Staging environment, e2e test suite, PostHog instrumentation, and internal cohort as proxy QA surface.",
+      "evidence": {
+        "mentionCount": 4,
+        "interviews": ["Rob", "Elodie", "LP"],
+        "sourceSections": ["6", "7"]
+      }
+    },
+    {
+      "id": "touchpoint-eop-checklist",
+      "laneId": "touchpoints",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Artifact",
+      "text": "EOP checklist, retro notes, SR&ED evidence pack, and upsell brief for next mandate cycle.",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["Chris", "LP"],
+        "projects": ["BIG Health"],
+        "sourceSections": ["6", "10"]
+      }
+    },
+    {
       "id": "thought-constraint-vs-autonomy",
       "laneId": "thoughts",
-      "handoffIds": ["skill-teammate", "sales-impl"],
+      "handoffIds": ["start-mandate", "sales"],
       "tag": "Tension",
       "text": "Tooling consistency helps onboarding, but heavy top-down constraints can suppress team experimentation.",
       "evidence": {
@@ -188,9 +397,10 @@
     {
       "id": "thought-speed-vs-craft",
       "laneId": "thoughts",
-      "handoffIds": ["dev-infra", "ai-dev"],
+      "handoffIds": ["deploy", "development"],
+      "developmentSubTrack": "dev",
       "tag": "Tension",
-      "text": "Fast vibe-coded paths can unlock learning but carry unacceptable risk when mandates touch regulated production systems.",
+      "text": "Fast vibe-coded paths unlock learning but carry unacceptable risk when mandates touch regulated production systems.",
       "evidence": {
         "mentionCount": 2,
         "interviews": ["Rob", "Elodie"],
@@ -199,9 +409,22 @@
       }
     },
     {
+      "id": "thought-flexible-vs-spec",
+      "laneId": "thoughts",
+      "handoffIds": ["sales"],
+      "tag": "Tension",
+      "text": "Flexible client asks vs. concrete specs — sales must signal which inputs are observations vs. commitments.",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Chris"],
+        "sourceSections": ["8"]
+      }
+    },
+    {
       "id": "backend-otel-posthog",
       "laneId": "backend",
-      "handoffIds": ["skill-teammate", "dev-infra"],
+      "handoffIds": ["deploy", "development"],
+      "developmentSubTrack": "infra",
       "tag": "System",
       "text": "Wire OTel traces from coding agents to PostHog so skill usage and workflow quality become observable.",
       "evidence": {
@@ -213,7 +436,8 @@
     {
       "id": "backend-setup-skill",
       "laneId": "backend",
-      "handoffIds": ["design-dev", "dev-infra"],
+      "handoffIds": ["start-mandate", "development"],
+      "developmentSubTrack": "dev",
       "tag": "System",
       "text": "Standardize setup skills and CLAUDE.md bootstrap paths to reduce repeated environment setup labor.",
       "evidence": {
@@ -226,7 +450,8 @@
     {
       "id": "team-design-dev-pair",
       "laneId": "team",
-      "handoffIds": ["design-dev"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
       "tag": "Owner",
       "text": "Primary ownership pair is designer plus dev, with project lead validating artifact completeness.",
       "evidence": {
@@ -237,7 +462,8 @@
     {
       "id": "team-ai-dev-pl",
       "laneId": "team",
-      "handoffIds": ["ai-dev", "design-ai"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
       "tag": "Owner",
       "text": "AI engineer and frontend engineer co-own feasibility decisions with PL escalation when model behavior shifts scope.",
       "evidence": {
@@ -246,11 +472,80 @@
       }
     },
     {
+      "id": "pain-vibe-inputs-as-spec",
+      "laneId": "pain",
+      "handoffIds": ["sales"],
+      "tag": "Friction",
+      "text": "Vibe-coded client inputs treated as spec — Convoy founder's ChatGPT financials as authoritative (LP).",
+      "severity": "high",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["LP"],
+        "projects": ["Convoy"],
+        "sourceSections": ["6", "8"]
+      }
+    },
+    {
+      "id": "pain-sme-alignment",
+      "laneId": "pain",
+      "handoffIds": ["discovery"],
+      "tag": "Friction",
+      "text": "SME alignment / requirements ambiguity — Gates: 135 criteria, conflicting SME scores (Adel).",
+      "severity": "high",
+      "evidence": {
+        "mentionCount": 4,
+        "interviews": ["Adel", "Adrienne"],
+        "projects": ["Gates"],
+        "sourceSections": ["6"]
+      }
+    },
+    {
+      "id": "pain-glossary-leaks",
+      "laneId": "pain",
+      "handoffIds": ["discovery"],
+      "tag": "Friction",
+      "text": "Glossary fragmentation leaks into prompts and code, fragmenting rubric interpretation.",
+      "severity": "med",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["Adrienne"],
+        "sourceSections": ["6"]
+      }
+    },
+    {
+      "id": "pain-setup-friction",
+      "laneId": "pain",
+      "handoffIds": ["start-mandate"],
+      "tag": "Friction",
+      "text": "Setup / onboarding friction — Unlocked Labs: two 1-hr setup meetings failed (Guy).",
+      "severity": "med",
+      "evidence": {
+        "mentionCount": 5,
+        "interviews": ["Guy"],
+        "projects": ["Unlocked Labs"],
+        "sourceSections": ["6"]
+      }
+    },
+    {
+      "id": "pain-skill-governance",
+      "laneId": "pain",
+      "handoffIds": ["start-mandate"],
+      "tag": "Friction",
+      "text": "Skill governance gaps — no evals, no contract for \"still works\" (LP).",
+      "severity": "med",
+      "evidence": {
+        "mentionCount": 4,
+        "interviews": ["LP"],
+        "sourceSections": ["6"]
+      }
+    },
+    {
       "id": "pain-source-of-truth-drift",
       "laneId": "pain",
-      "handoffIds": ["design-dev", "design-ai"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
       "tag": "Friction",
-      "text": "Source-of-truth drift between Figma, prototype, Storybook, and production code.",
+      "text": "Source-of-truth drift across artifacts — Figma / prototype / Storybook / prod drift (Dmitry).",
       "severity": "high",
       "evidence": {
         "mentionCount": 7,
@@ -261,9 +556,10 @@
     {
       "id": "pain-token-enforcement-gap",
       "laneId": "pain",
-      "handoffIds": ["design-dev"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
       "tag": "Friction",
-      "text": "No shared component library or token enforcement causes repeated rebuilds and style drift.",
+      "text": "No shared component / token registry causes repeated rebuilds and style drift.",
       "severity": "high",
       "evidence": {
         "mentionCount": 5,
@@ -273,177 +569,104 @@
     {
       "id": "pain-feasibility-gap",
       "laneId": "pain",
-      "handoffIds": ["design-ai", "ai-dev"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
       "tag": "Friction",
-      "text": "AI-mocked features look viable in prototypes but fail production feasibility checks later.",
+      "text": "AI-mock vs. prod feasibility gap — Gates: PDF highlighting trivial to mock, hard to ship.",
       "severity": "high",
       "evidence": {
         "mentionCount": 5,
+        "interviews": ["Adel"],
+        "projects": ["Gates"],
         "sourceSections": ["6", "8"]
-      }
-    },
-    {
-      "id": "pain-setup-friction",
-      "laneId": "pain",
-      "handoffIds": ["design-dev", "dev-infra"],
-      "tag": "Friction",
-      "text": "Setup and onboarding friction delays mandates through environment and repo access blockers.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 5,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-skill-governance",
-      "laneId": "pain",
-      "handoffIds": ["skill-teammate"],
-      "tag": "Friction",
-      "text": "Skill discoverability, contribution, and evaluation governance remains unclear across teams.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 4,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-sme-alignment",
-      "laneId": "pain",
-      "handoffIds": ["ai-dev", "sales-impl"],
-      "tag": "Friction",
-      "text": "SME alignment and ambiguous requirements create unstable calibration targets for AI outputs.",
-      "severity": "high",
-      "evidence": {
-        "mentionCount": 4,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-manual-copy-paste",
-      "laneId": "pain",
-      "handoffIds": ["skill-teammate", "sales-impl"],
-      "tag": "Friction",
-      "text": "Locked-down environments force manual copy-paste transfer between systems and teams.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 3,
-        "sourceSections": ["6", "5E"]
       }
     },
     {
       "id": "pain-late-staging-access",
       "laneId": "pain",
-      "handoffIds": ["design-dev", "eop-retro"],
+      "handoffIds": ["deploy"],
       "tag": "Friction",
-      "text": "Late designer access to staging and QA causes late-cycle surprises and workaround testing.",
+      "text": "Late designer access to staging / QA causes late-cycle surprises.",
       "severity": "med",
       "evidence": {
         "mentionCount": 3,
         "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-ai-libraries",
-      "laneId": "pain",
-      "handoffIds": ["ai-dev"],
-      "tag": "Friction",
-      "text": "AI tools take liberties with architecture and context, introducing over-specification and drift.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 3,
-        "sourceSections": ["6", "8"]
-      }
-    },
-    {
-      "id": "pain-glossary-leaks",
-      "laneId": "pain",
-      "handoffIds": ["design-ai", "ai-dev"],
-      "tag": "Friction",
-      "text": "Glossary inconsistency leaks into prompts and code, fragmenting rubric interpretation.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 2,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-context-switching",
-      "laneId": "pain",
-      "handoffIds": ["skill-teammate", "eop-retro"],
-      "tag": "Friction",
-      "text": "Context-switching between mandates and tools drives cognitive overhead and continuity loss.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 2,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-knowledge-fragmentation",
-      "laneId": "pain",
-      "handoffIds": ["skill-teammate", "sales-impl"],
-      "tag": "Friction",
-      "text": "Knowledge fragmentation across Notion, Drive, Slack, and HR tools raises handoff friction.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 2,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-vibe-inputs-as-spec",
-      "laneId": "pain",
-      "handoffIds": ["sales-impl"],
-      "tag": "Friction",
-      "text": "Client vibe-coded AI outputs are treated as specifications instead of observations to validate.",
-      "severity": "high",
-      "evidence": {
-        "mentionCount": 1,
-        "sourceSections": ["6", "8"]
-      }
-    },
-    {
-      "id": "pain-repo-location-drift",
-      "laneId": "pain",
-      "handoffIds": ["design-dev"],
-      "tag": "Friction",
-      "text": "Prototype repository location drifts between personal and organization ownership during delivery.",
-      "severity": "med",
-      "evidence": {
-        "mentionCount": 2,
-        "sourceSections": ["6"]
-      }
-    },
-    {
-      "id": "pain-eop-unfunded",
-      "laneId": "pain",
-      "handoffIds": ["eop-retro"],
-      "tag": "Friction",
-      "text": "EOP checklist and retro outcomes are often unfunded post-billing work.",
-      "severity": "high",
-      "evidence": {
-        "mentionCount": 1,
-        "sourceSections": ["6", "10"]
       }
     },
     {
       "id": "pain-qa-convention-missing",
       "laneId": "pain",
-      "handoffIds": ["dev-infra", "eop-retro"],
+      "handoffIds": ["deploy"],
       "tag": "Friction",
-      "text": "No agreed QA convention or observability baseline exists across mandates.",
+      "text": "No team-wide QA convention; observability \"where testing was 15 yrs ago\" (Rob).",
       "severity": "med",
       "evidence": {
         "mentionCount": 2,
+        "interviews": ["Elodie", "Rob"],
         "sourceSections": ["6", "10"]
+      }
+    },
+    {
+      "id": "pain-eop-unfunded",
+      "laneId": "pain",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Friction",
+      "text": "EOP checklist is unfunded post-billing work (Chris).",
+      "severity": "high",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Chris"],
+        "sourceSections": ["6", "10"]
+      }
+    },
+    {
+      "id": "pain-manual-copy-paste",
+      "laneId": "pain",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Friction",
+      "text": "Manual copy-paste at locked-down boundary — BIG Health: every artifact crossed by hand (LP).",
+      "severity": "med",
+      "evidence": {
+        "mentionCount": 3,
+        "interviews": ["LP"],
+        "projects": ["BIG Health"],
+        "sourceSections": ["6", "5E"]
+      }
+    },
+    {
+      "id": "opp-vibe-as-observation",
+      "laneId": "opportunity",
+      "handoffIds": ["sales"],
+      "tag": "Opportunity",
+      "text": "Decision rule: vibe-coded client AI output = observation, not spec (LP, RJ).",
+      "impact": "high",
+      "tier": "tier-2",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["LP"],
+        "sourceSections": ["7", "8"]
+      }
+    },
+    {
+      "id": "opp-glossary-bootstrap",
+      "laneId": "opportunity",
+      "handoffIds": ["discovery"],
+      "tag": "Opportunity",
+      "text": "Glossary bootstrap as Phase 0; SME working session before prompting (Adrienne, Adel).",
+      "impact": "med",
+      "tier": "tier-2",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["Adrienne", "Adel"],
+        "sourceSections": ["7", "9"]
       }
     },
     {
       "id": "opp-context-registry",
       "laneId": "opportunity",
-      "handoffIds": ["design-dev", "ai-dev", "skill-teammate"],
+      "handoffIds": ["start-mandate", "development"],
       "tag": "Opportunity",
-      "text": "Make Context Registry artifacts mandatory at kickoff across every mandate.",
+      "text": "Context Registry (AGENTS.md / DESIGN.md / DATA.MD) mandatory at kickoff across every mandate.",
       "impact": "high",
       "tier": "tier-1",
       "archetypes": ["greenfield", "brownfield"],
@@ -455,9 +678,9 @@
     {
       "id": "opp-setup-skill",
       "laneId": "opportunity",
-      "handoffIds": ["design-dev", "dev-infra"],
+      "handoffIds": ["start-mandate"],
       "tag": "Opportunity",
-      "text": "Standardize setup skill scaffolding and run fresh-machine validation in CI.",
+      "text": "Setup skill / scaffolding with fresh-machine validation in CI.",
       "impact": "high",
       "tier": "tier-1",
       "evidence": {
@@ -468,9 +691,10 @@
     {
       "id": "opp-design-token-registry",
       "laneId": "opportunity",
-      "handoffIds": ["design-dev"],
+      "handoffIds": ["start-mandate", "development"],
+      "developmentSubTrack": "design",
       "tag": "Opportunity",
-      "text": "Create a shared design-token and component registry in sprint 0 for each mandate.",
+      "text": "Shared design-token registry in sprint 0 for each mandate.",
       "impact": "high",
       "tier": "tier-1",
       "evidence": {
@@ -481,9 +705,9 @@
     {
       "id": "opp-org-prototype-default",
       "laneId": "opportunity",
-      "handoffIds": ["design-dev", "sales-impl"],
+      "handoffIds": ["start-mandate"],
       "tag": "Opportunity",
-      "text": "Default all prototype repositories to Toboggan org ownership at mandate kickoff.",
+      "text": "Prototype repo on Toboggan org by default at mandate kickoff.",
       "impact": "high",
       "tier": "tier-1",
       "evidence": {
@@ -492,63 +716,42 @@
       }
     },
     {
-      "id": "opp-otel-observability",
+      "id": "opp-meta-prompt-skill",
       "laneId": "opportunity",
-      "handoffIds": ["skill-teammate", "dev-infra"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
       "tag": "Opportunity",
-      "text": "Instrument workflow and skill invocation telemetry end-to-end with OTel and PostHog.",
-      "impact": "high",
-      "tier": "tier-1",
-      "evidence": {
-        "mentionCount": 4,
-        "sourceSections": ["7", "9"]
-      }
-    },
-    {
-      "id": "opp-eval-contracts",
-      "laneId": "opportunity",
-      "handoffIds": ["ai-dev", "skill-teammate"],
-      "tag": "Opportunity",
-      "text": "Adopt output-shape evaluation contracts for shared skills before broad rollout.",
-      "impact": "med",
-      "tier": "tier-2",
-      "evidence": {
-        "mentionCount": 3,
-        "sourceSections": ["7", "9"]
-      }
-    },
-    {
-      "id": "opp-feasibility-spike",
-      "laneId": "opportunity",
-      "handoffIds": ["design-ai", "ai-dev"],
-      "tag": "Opportunity",
-      "text": "Introduce a feasibility-spike trigger when AI difficulty signals implementation risk.",
+      "text": "Meta-prompting workflow as a skill; Storybook-MCP for AI component lookup (Dmitry, Claire).",
       "impact": "med",
       "tier": "tier-2",
       "evidence": {
         "mentionCount": 2,
+        "interviews": ["Dmitry", "Claire"],
         "sourceSections": ["7", "9"]
       }
     },
     {
       "id": "opp-living-design-journal",
       "laneId": "opportunity",
-      "handoffIds": ["design-dev", "eop-retro"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
       "tag": "Opportunity",
-      "text": "Run a living design journal workflow that converts weekly notes into decision logs.",
+      "text": "Living design journal skill — weekly notes into decision logs (Adrienne).",
       "impact": "med",
       "tier": "tier-2",
       "evidence": {
         "mentionCount": 2,
+        "interviews": ["Adrienne"],
         "sourceSections": ["7", "9"]
       }
     },
     {
-      "id": "opp-glossary-bootstrap",
+      "id": "opp-feasibility-spike",
       "laneId": "opportunity",
-      "handoffIds": ["design-ai", "ai-dev"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
       "tag": "Opportunity",
-      "text": "Add glossary bootstrap as phase 0 for niche-domain mandates before prompt iteration.",
+      "text": "Feasibility-spike trigger when AI difficulty signals implementation risk (\"AI hard = dev hard\").",
       "impact": "med",
       "tier": "tier-2",
       "evidence": {
@@ -559,9 +762,10 @@
     {
       "id": "opp-hitl-gates",
       "laneId": "opportunity",
-      "handoffIds": ["ai-dev", "skill-teammate"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
       "tag": "Opportunity",
-      "text": "Require human-in-the-loop approval gates for expensive or irreversible AI operations.",
+      "text": "HITL approval gates for expensive or irreversible AI actions.",
       "impact": "med",
       "tier": "tier-2",
       "evidence": {
@@ -570,24 +774,69 @@
       }
     },
     {
+      "id": "opp-otel-observability",
+      "laneId": "opportunity",
+      "handoffIds": ["deploy"],
+      "tag": "Opportunity",
+      "text": "OTel → PostHog telemetry via Glide Bootstrap; Vercel preview as visual version control.",
+      "impact": "high",
+      "tier": "tier-1",
+      "evidence": {
+        "mentionCount": 4,
+        "interviews": ["Claire", "Rob"],
+        "sourceSections": ["7", "9"]
+      }
+    },
+    {
+      "id": "opp-terraform-guardrails",
+      "laneId": "opportunity",
+      "handoffIds": ["deploy", "development"],
+      "developmentSubTrack": "infra",
+      "tag": "Opportunity",
+      "text": "Cost-estimate guardrails before terraform apply (Rob).",
+      "impact": "med",
+      "tier": "tier-2",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Rob"],
+        "sourceSections": ["7"]
+      }
+    },
+    {
+      "id": "opp-eval-contracts",
+      "laneId": "opportunity",
+      "handoffIds": ["end-of-mandate", "development"],
+      "developmentSubTrack": "data-ai",
+      "tag": "Opportunity",
+      "text": "Eval contracts / output-shape assertions; model benchmarking per skill (GLM 5.1 vs. Claude).",
+      "impact": "med",
+      "tier": "tier-2",
+      "evidence": {
+        "mentionCount": 3,
+        "interviews": ["LP"],
+        "sourceSections": ["7", "9"]
+      }
+    },
+    {
       "id": "opp-bridge-playbook",
       "laneId": "opportunity",
-      "handoffIds": ["sales-impl", "skill-teammate"],
+      "handoffIds": ["end-of-mandate"],
       "tag": "Opportunity",
-      "text": "Create a bridge-pattern playbook for locked-down client environments.",
+      "text": "Bridge-pattern playbook for locked-down client environments (LP).",
       "impact": "high",
       "tier": "tier-3",
       "evidence": {
         "mentionCount": 1,
+        "interviews": ["LP"],
         "sourceSections": ["7", "9"]
       }
     },
     {
       "id": "opp-ai-workflow-forum",
       "laneId": "opportunity",
-      "handoffIds": ["eop-retro", "skill-teammate"],
+      "handoffIds": ["end-of-mandate"],
       "tag": "Opportunity",
-      "text": "Run a recurring cross-disciplinary AI workflow forum to close decision latency.",
+      "text": "Bi-weekly cross-discipline AI forum to close decision latency.",
       "impact": "med",
       "tier": "tier-3",
       "evidence": {
@@ -596,9 +845,219 @@
       }
     },
     {
+      "id": "question-vibe-garbage",
+      "laneId": "open-questions",
+      "handoffIds": ["sales"],
+      "tag": "Question",
+      "text": "When does vibe-coded client input stop being raw material and start being garbage?",
+      "evidence": {
+        "mentionCount": 1,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-ai-literacy-gate",
+      "laneId": "open-questions",
+      "handoffIds": ["sales"],
+      "tag": "Question",
+      "text": "What client AI-literacy gate belongs in scoping?",
+      "evidence": {
+        "mentionCount": 1,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-designer-handoff-template",
+      "laneId": "open-questions",
+      "handoffIds": ["discovery"],
+      "tag": "Question",
+      "text": "Designer-to-designer handoff template (Adrienne flagged) — who owns it?",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Adrienne"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-glossary-owner",
+      "laneId": "open-questions",
+      "handoffIds": ["discovery"],
+      "tag": "Question",
+      "text": "Who owns glossary work? PL, designer, or SME session?",
+      "evidence": {
+        "mentionCount": 2,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-tooling-constraint",
+      "laneId": "open-questions",
+      "handoffIds": ["start-mandate"],
+      "tag": "Question",
+      "text": "Constraint vs. autonomy on tooling (Cursor + Claude as default?)",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["Guy", "Antoine"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-storybook-timing",
+      "laneId": "open-questions",
+      "handoffIds": ["start-mandate"],
+      "tag": "Question",
+      "text": "Storybook adoption: early discipline or late maturity?",
+      "evidence": {
+        "mentionCount": 2,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-skill-ownership",
+      "laneId": "open-questions",
+      "handoffIds": ["start-mandate"],
+      "tag": "Question",
+      "text": "Skill ownership: personal customization vs. shared contribution.",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["LP"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-registry-owner",
+      "laneId": "open-questions",
+      "handoffIds": ["start-mandate"],
+      "tag": "Question",
+      "text": "Who owns the Context Registry — PL, designer, or maintainer role?",
+      "evidence": {
+        "mentionCount": 3,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-designer-led-fe",
+      "laneId": "open-questions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
+      "tag": "Question",
+      "text": "Designer-led FE: greenfield blessing or brownfield blessing? (Adrienne vs. Rob disagree)",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["Adrienne", "Rob"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-ai-prototype-form",
+      "laneId": "open-questions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
+      "tag": "Question",
+      "text": "AI prototype as code (Cadel) vs. visual reference (Ian)?",
+      "evidence": {
+        "mentionCount": 2,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-ai-architecture-trust",
+      "laneId": "open-questions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "dev",
+      "tag": "Question",
+      "text": "AI architecture suggestions: trust or escalate before PR?",
+      "evidence": {
+        "mentionCount": 2,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-prototype-graduation",
+      "laneId": "open-questions",
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
+      "tag": "Question",
+      "text": "Greenfield endgame: when does prototype graduate to product?",
+      "evidence": {
+        "mentionCount": 2,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-speed-vs-craft",
+      "laneId": "open-questions",
+      "handoffIds": ["deploy"],
+      "tag": "Question",
+      "text": "Speed vs. craft — vibe-coded throwaway vs. HIPAA-grade?",
+      "evidence": {
+        "mentionCount": 2,
+        "interviews": ["Rob", "Elodie"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-observability-scope",
+      "laneId": "open-questions",
+      "handoffIds": ["deploy"],
+      "tag": "Question",
+      "text": "Is observability per-project or shared infra?",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Rob"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-volume-telemetry",
+      "laneId": "open-questions",
+      "handoffIds": ["deploy"],
+      "tag": "Question",
+      "text": "Volume telemetry without content — useful or shallow?",
+      "evidence": {
+        "mentionCount": 1,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-eop-timing",
+      "laneId": "open-questions",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Question",
+      "text": "EOP: integrate into earlier phases or keep as wrap-up?",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["Chris"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-shared-skills-drift",
+      "laneId": "open-questions",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Question",
+      "text": "How do shared skills get better when everyone modifies their copy? (LP)",
+      "evidence": {
+        "mentionCount": 1,
+        "interviews": ["LP"],
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
+      "id": "question-repo-lifecycle",
+      "laneId": "open-questions",
+      "handoffIds": ["end-of-mandate"],
+      "tag": "Question",
+      "text": "Repo lifecycle after handoff — archived, linked, or deleted?",
+      "evidence": {
+        "mentionCount": 2,
+        "sourceSections": ["8", "10"]
+      }
+    },
+    {
       "id": "initiative-context-registry-rollout",
       "laneId": "initiatives",
-      "handoffIds": ["design-dev", "ai-dev"],
+      "handoffIds": ["start-mandate"],
       "tag": "Tier 1",
       "text": "Roll out mandatory Context Registry kickoff template to all new mandates.",
       "status": "active",
@@ -611,7 +1070,7 @@
     {
       "id": "initiative-setup-skill-ci",
       "laneId": "initiatives",
-      "handoffIds": ["dev-infra", "design-dev"],
+      "handoffIds": ["start-mandate"],
       "tag": "Tier 1",
       "text": "Ship setup skill with fresh-machine CI validation path.",
       "status": "active",
@@ -624,7 +1083,7 @@
     {
       "id": "initiative-otel-posthog-bridge",
       "laneId": "initiatives",
-      "handoffIds": ["skill-teammate", "dev-infra"],
+      "handoffIds": ["deploy"],
       "tag": "Tier 1",
       "text": "Implement OTel to PostHog trace bridge for workflow observability.",
       "status": "planned",
@@ -637,7 +1096,8 @@
     {
       "id": "initiative-feasibility-spike-policy",
       "laneId": "initiatives",
-      "handoffIds": ["design-ai", "ai-dev"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "data-ai",
       "tag": "Tier 2",
       "text": "Codify feasibility spike trigger and escalation path before high-risk demo commitments.",
       "status": "planned",
@@ -650,7 +1110,8 @@
     {
       "id": "initiative-design-journal-automation",
       "laneId": "initiatives",
-      "handoffIds": ["eop-retro", "design-dev"],
+      "handoffIds": ["development"],
+      "developmentSubTrack": "design",
       "tag": "Tier 2",
       "text": "Automate weekly design decision journal generation from working notes and meeting context.",
       "status": "planned",
@@ -663,7 +1124,7 @@
     {
       "id": "initiative-bridge-playbook",
       "laneId": "initiatives",
-      "handoffIds": ["sales-impl", "skill-teammate"],
+      "handoffIds": ["end-of-mandate"],
       "tag": "Tier 3",
       "text": "Publish locked-down environment bridge playbook for constrained mandates.",
       "status": "planned",
@@ -676,7 +1137,7 @@
     {
       "id": "initiative-ai-forum-trial",
       "laneId": "initiatives",
-      "handoffIds": ["eop-retro", "skill-teammate"],
+      "handoffIds": ["end-of-mandate"],
       "tag": "Tier 3",
       "text": "Run 30-day cross-disciplinary AI workflow forum pilot and collect attendance outcomes.",
       "status": "planned",
@@ -688,103 +1149,89 @@
     }
   ],
   "thoughtSentiments": {
-    "sales-impl": 0.45,
-    "design-ai": 0.35,
-    "design-dev": 0.25,
-    "ai-dev": 0.55,
-    "dev-infra": 0.78,
-    "skill-teammate": 0.68,
-    "eop-retro": 0.92
+    "sales": 0.45,
+    "discovery": 0.35,
+    "start-mandate": 0.42,
+    "development": 0.28,
+    "deploy": 0.78,
+    "end-of-mandate": 0.92
   },
   "kpis": [
     {
-      "handoffId": "design-dev",
+      "handoffId": "sales",
+      "qualLabel": "Signal quality",
+      "qualValue": "Sales context translated into discovery constraints",
+      "quantLabel": "Evidence coverage",
+      "quantValue": "1 / 15 interviews",
+      "health": "bad",
+      "detailBullets": [
+        "Vibe-coded client inputs as spec remains an open policy gap.",
+        "Decision rule for observation vs. spec is highest-leverage follow-up."
+      ],
+      "spark": [0, 0, 1, 1, 1, 1]
+    },
+    {
+      "handoffId": "discovery",
+      "qualLabel": "Scope clarity",
+      "qualValue": "SME alignment and glossary seeded before kickoff",
+      "quantLabel": "Evidence coverage",
+      "quantValue": "4 / 15 interviews",
+      "health": "warn",
+      "detailBullets": [
+        "SME alignment and glossary fragmentation are recurring friction.",
+        "Glossary bootstrap as Phase 0 is the fastest risk reducer."
+      ],
+      "spark": [1, 2, 2, 3, 4, 4]
+    },
+    {
+      "handoffId": "start-mandate",
+      "qualLabel": "Kickoff readiness",
+      "qualValue": "Registry seeded, repos provisioned, setup skill run",
+      "quantLabel": "Evidence coverage",
+      "quantValue": "5 / 15 interviews",
+      "health": "warn",
+      "detailBullets": [
+        "Setup friction and skill governance gaps cluster at kickoff.",
+        "Context Registry and setup skill are tier-1 initiatives."
+      ],
+      "spark": [2, 3, 3, 4, 5, 5]
+    },
+    {
+      "handoffId": "development",
       "qualLabel": "Handoff hygiene",
       "qualValue": "Bundle includes prototype, branch, token path, and owner",
       "quantLabel": "Evidence coverage",
       "quantValue": "9 / 15 interviews",
       "health": "good",
       "detailBullets": [
-        "Most referenced handoff in synthesis.",
-        "Source-of-truth drift remains top ranked pain and must be tracked against this handoff."
+        "Most referenced phase — Design → Dev is the dominant pain surface.",
+        "Source-of-truth drift and feasibility gaps must be tracked per sub-track."
       ],
       "spark": [4, 5, 6, 7, 8, 9]
     },
     {
-      "handoffId": "ai-dev",
-      "qualLabel": "Contract readiness",
-      "qualValue": "API and rubric agreed before FE dependence",
-      "quantLabel": "Coverage vs friction",
-      "quantValue": "6 mentions, feasibility gaps in 5 pain references",
-      "health": "warn",
-      "detailBullets": [
-        "Strong usage pattern but persistent implementation surprise risk.",
-        "Use feasibility spike policy to improve alignment speed."
-      ],
-      "spark": [2, 3, 4, 5, 5, 6]
-    },
-    {
-      "handoffId": "dev-infra",
+      "handoffId": "deploy",
       "qualLabel": "Operational continuity",
-      "qualValue": "Infra transitions are documented with reproducible setup",
-      "quantLabel": "Explicit handoff signal",
+      "qualValue": "QA signed, live with instrumentation",
+      "quantLabel": "Evidence coverage",
       "quantValue": "3 / 15 interviews",
       "health": "warn",
       "detailBullets": [
-        "Mentions are low relative to impact of infrastructure choices.",
-        "Setup skill and telemetry are the fastest risk reducers."
+        "Late staging access and missing QA conventions cause late surprises.",
+        "OTel → PostHog telemetry is the fastest observability win."
       ],
       "spark": [1, 1, 2, 2, 3, 3]
     },
     {
-      "handoffId": "skill-teammate",
-      "qualLabel": "Skill portability",
-      "qualValue": "Teammates can invoke and adapt shared skills without copy-paste",
-      "quantLabel": "Cross-discipline signal",
-      "quantValue": "5 / 15 interviews",
-      "health": "good",
-      "detailBullets": [
-        "Strong evidence across product, AI, and operations contexts.",
-        "Governance and eval contracts remain open implementation tasks."
-      ],
-      "spark": [1, 2, 3, 4, 4, 5]
-    },
-    {
-      "handoffId": "design-ai",
-      "qualLabel": "Design intent transfer",
-      "qualValue": "AI receives explicit design constraints before modeling",
-      "quantLabel": "Coverage gap",
-      "quantValue": "2 / 15 interviews",
-      "health": "bad",
-      "detailBullets": [
-        "Low explicit coverage and repeated glossary/feasibility issues.",
-        "Prioritize glossary bootstrap and feasibility spikes."
-      ],
-      "spark": [1, 1, 1, 2, 2, 2]
-    },
-    {
-      "handoffId": "sales-impl",
-      "qualLabel": "Signal quality",
-      "qualValue": "Sales/discovery context translated into implementation constraints",
-      "quantLabel": "Coverage gap",
-      "quantValue": "1 explicit + 1 implicit reference",
-      "health": "bad",
-      "detailBullets": [
-        "Coverage gap remains one of the highest-leverage research follow-ups.",
-        "Bridge playbook and observation-vs-spec policy are unresolved."
-      ],
-      "spark": [0, 0, 1, 1, 1, 1]
-    },
-    {
-      "handoffId": "eop-retro",
+      "handoffId": "end-of-mandate",
       "qualLabel": "Learning loop closure",
       "qualValue": "Retro outputs become funded next-step initiatives",
-      "quantLabel": "Coverage gap",
-      "quantValue": "1 explicit reference",
+      "quantLabel": "Evidence coverage",
+      "quantValue": "1 / 15 interviews",
       "health": "bad",
       "detailBullets": [
         "EOP work is often unfunded despite high strategic value.",
-        "Per-mandate atlas from retro is tracked as P2 expansion."
+        "Bridge playbook and AI forum pilot are tier-3 expansion paths."
       ],
       "spark": [0, 0, 0, 1, 1, 1]
     }

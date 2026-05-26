@@ -148,7 +148,7 @@ function CollapsedLaneHandoffPlaceholder({
               "border-r border-b border-border px-2 py-2 align-top last:border-r-0",
               toneByLaneId[laneId],
               isFocusCell && "ring-1 ring-ring/35 ring-inset",
-              handoffIndex === handoffs.length - 1 && "!border-r-0"
+              handoffIndex === handoffs.length - 1 && "border-r-0!"
             )}
           >
             <p className="text-center text-[10px] text-muted-foreground">—</p>
@@ -161,7 +161,7 @@ function CollapsedLaneHandoffPlaceholder({
 
 function OwnershipCard({ card }: Readonly<{ card: JourneyOwnershipCard }>) {
   return (
-    <div className="w-full max-w-[200px] rounded-md border border-border bg-card p-2 text-card-foreground">
+    <div className="w-full max-w-50 rounded-md border border-border bg-card p-2 text-card-foreground">
       <p className="text-xs font-semibold leading-5 text-foreground">{card.label}</p>
       {card.description ? (
         <p className="mt-1 line-clamp-2 text-[11px] leading-snug text-muted-foreground">
@@ -189,7 +189,7 @@ function ItemCard({
       type="button"
       onClick={() => onSelectItem(item)}
       className={cn(
-        "w-full max-w-[200px] rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
+        "w-full max-w-50 rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
         selectedItemId === item.id && "border-ring ring-1 ring-ring/45"
       )}
     >
@@ -595,7 +595,7 @@ function OpportunityLaneTierRows({
                   toneByLaneId[lane.id],
                   bandIndex > 0 && "border-t border-border",
                   isFocusCell && "ring-1 ring-ring/35 ring-inset",
-                  handoffIndex === handoffs.length - 1 && "!border-r-0"
+                  handoffIndex === handoffs.length - 1 && "border-r-0!"
                 )}
               >
                 {allOpp.length === 0 ? (
@@ -645,7 +645,7 @@ function OpportunityTierBandCell({
           type="button"
           onClick={() => onSelectItem(item)}
           className={cn(
-            "w-full max-w-[200px] rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
+            "w-full max-w-50 rounded-md border border-border bg-card p-2 text-left text-card-foreground transition-colors hover:bg-muted/40",
             selectedItemId === item.id && "border-ring ring-1 ring-ring/45"
           )}
         >
@@ -713,7 +713,7 @@ export function JourneyGrid({
         className={cn(
           journeyAtlasColumnCellClassName,
           journeyAtlasLaneRailStickyClassName,
-          "z-[30] flex items-end md:min-h-[9.25rem]",
+          "z-30 flex items-end md:min-h-37",
           stageHeaderTone
         )}
       >
@@ -732,18 +732,18 @@ export function JourneyGrid({
             className={cn(
               journeyAtlasColumnCellClassName,
               stageHeaderTone,
-              "relative md:min-h-[9.25rem]",
-              index === handoffs.length - 1 && "!border-r-0",
+              "relative md:min-h-37",
+              index === handoffs.length - 1 && "border-r-0!",
               isActive && "ring-2 ring-inset ring-primary-foreground/35"
             )}
           >
             {isActive ? (
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary-foreground/[0.12] to-transparent"
+                className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary-foreground/12 to-transparent"
               />
             ) : null}
-            <div className="relative z-[1]">
+            <div className="relative z-1">
               {stage ? (
                 <>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-primary-foreground/55">
@@ -778,7 +778,7 @@ export function JourneyGrid({
         className={cn(
           journeyAtlasColumnCellClassName,
           journeyAtlasLaneRailStickyClassName,
-          "z-[26] border-b bg-card px-3 py-2.5"
+          "z-26 border-b bg-card px-3 py-2.5"
         )}
       >
         <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -797,7 +797,7 @@ export function JourneyGrid({
             className={cn(
               journeyAtlasColumnCellClassName,
               "border-r border-b border-border bg-muted/20 px-2 py-2 align-top last:border-r-0",
-              index === handoffs.length - 1 && "!border-r-0",
+              index === handoffs.length - 1 && "border-r-0!",
               isActive && "ring-1 ring-ring/35 ring-inset"
             )}
           >
@@ -911,7 +911,7 @@ export function JourneyGrid({
                     "border-r border-b border-border p-2.5 align-top last:border-r-0",
                     toneByLaneId[lane.id],
                     isFocusCell && "ring-1 ring-ring/35 ring-inset",
-                    handoffIndex === handoffs.length - 1 && "!border-r-0"
+                    handoffIndex === handoffs.length - 1 && "border-r-0!"
                   )}
                 >
                   {lane.id === "thoughts" ? (

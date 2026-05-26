@@ -90,6 +90,7 @@ export function JourneyAtlas({
   const [selectedLocalItemId, setSelectedLocalItemId] = useState<string | null>(null)
   const [kpiDetailOpen, setKpiDetailOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const getScrollElement = useCallback(() => scrollRef.current, [])
   const {
     viewport,
     zoomStyle,
@@ -100,7 +101,7 @@ export function JourneyAtlas({
     onDrag,
     endDrag,
     setZoom,
-  } = useJourneyViewport(scrollRef)
+  } = useJourneyViewport(getScrollElement)
 
   const filteredItems = useMemo(
     () => data.items.filter((item) => matchesFilter(item, filter)),

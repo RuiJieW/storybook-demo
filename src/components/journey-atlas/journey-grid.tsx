@@ -288,7 +288,6 @@ function LaneCellContent({
   handoff,
   cellItems,
   items,
-  thoughtSentiments,
   selectedItemId,
   onSelectItem,
   hideTierBadge = false,
@@ -297,7 +296,6 @@ function LaneCellContent({
   handoff: JourneyHandoff
   cellItems: JourneyItem[]
   items: JourneyItem[]
-  thoughtSentiments?: Readonly<Partial<Record<string, number>>>
   selectedItemId: string | null
   onSelectItem: (item: JourneyItem) => void
   hideTierBadge?: boolean
@@ -742,7 +740,7 @@ export function JourneyGrid({
             {isActive ? (
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary-foreground/[0.12] to-transparent"
+                className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary-foreground/[0.12] to-transparent"
               />
             ) : null}
             <div className="relative z-[1]">
@@ -817,8 +815,8 @@ export function JourneyGrid({
                   </div>
                 ))}
               </div>
-            ) : ownershipByHandoffId.has(handoff.id) ? (
-              <OwnershipCard card={ownershipByHandoffId.get(handoff.id)!} />
+            ) : ownershipCard ? (
+              <OwnershipCard card={ownershipCard} />
             ) : (
               <p className="py-1 text-center text-[10px] text-muted-foreground">—</p>
             )}
@@ -927,7 +925,6 @@ export function JourneyGrid({
                       handoff={handoff}
                       cellItems={cellItems}
                       items={items}
-                      thoughtSentiments={thoughtSentiments}
                       selectedItemId={selectedItemId}
                       onSelectItem={onSelectItem}
                     />

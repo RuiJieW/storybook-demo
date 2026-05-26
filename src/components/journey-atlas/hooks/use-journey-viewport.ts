@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useMemo, useRef, useState, type RefObject } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 
 type ViewportState = Readonly<{
   zoom: number
@@ -14,7 +14,7 @@ function clampZoom(value: number) {
 }
 
 export function useJourneyViewport(
-  scrollRef?: RefObject<HTMLElement | null>
+  getScrollElement?: () => HTMLElement | null
 ) {
   const [viewport, setViewport] = useState<ViewportState>({
     zoom: 1,
@@ -44,12 +44,11 @@ export function useJourneyViewport(
 
   const fitToScreen = useCallback(() => {
     setViewport({ zoom: 1 })
-    const scrollEl = scrollRef?.current
+    const scrollEl = getScrollElement?.()
     if (scrollEl) {
-      scrollEl.scrollLeft = 0
-      scrollEl.scrollTop = 0
+      scrollEl.scrollTo({ left: 0, top: 0 })
     }
-  }, [scrollRef])
+  }, [getScrollElement])
 
   const startDrag = useCallback((x: number, y: number) => {
     dragRef.current = { x, y }
@@ -65,13 +64,15 @@ export function useJourneyViewport(
       const deltaY = y - dragRef.current.y
       dragRef.current = { x, y }
 
-      const scrollEl = scrollRef?.current
+      const scrollEl = getScrollElement?.()
       if (scrollEl) {
-        scrollEl.scrollLeft -= deltaX
-        scrollEl.scrollTop -= deltaY
+        scrollEl.scrollTo({
+          left: scrollEl.scrollLeft - deltaX,
+          top: scrollEl.scrollTop - deltaY,
+        })
       }
     },
-    [scrollRef]
+    [getScrollElement]
   )
 
   const endDrag = useCallback(() => {

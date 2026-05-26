@@ -11,7 +11,7 @@ const preview: Preview = {
         className={cn(
           ...fontVariables,
           fontSans.className,
-          "min-h-[200px] bg-background p-6 text-foreground",
+          "min-h-50 bg-background p-6 text-foreground",
         )}
       >
         <Story />

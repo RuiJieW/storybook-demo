@@ -6,6 +6,7 @@ import { useTheme } from "next-themes"
 import {
   BeakerIcon,
   BookOpenIcon,
+  GitBranchIcon,
   LayoutDashboardIcon,
   MapIcon,
 } from "lucide-react"
@@ -40,6 +41,7 @@ const labItem = {
 const experimentItems = [
   { title: "Dashboard", href: "/dashboard", icon: LayoutDashboardIcon },
   { title: "Journey Atlas", href: "/user-journey", icon: MapIcon },
+  { title: "Mandate Lifecycle", href: "/mandate-lifecycle", icon: GitBranchIcon },
 ] as const
 
 function isNavActive(pathname: string, href: string) {
